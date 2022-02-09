@@ -18,7 +18,7 @@ COPY ./rtf/config.ini.dev /code/config.ini
 
 RUN python rtf/manage.py makemigrations
 
-RUN python rtf/manage.py migrate
+RUN python manage.py migrate
 
 EXPOSE 8000
 
