@@ -17,12 +17,11 @@ class CreateGrowthModelView(APIView):
     	if serializer.is_valid():
     		data = serializer.validated_data
     		job_type = data['job_type']
-    		step = data['current_step']
     		try:
     			growth_model_obj, created = GrowthModel.objects.get_or_create(
     				user_id=request.user.id)
     			growth_model_obj.job_type = job_type
-    			growth_model_obj.step = step
+    			growth_model_obj.current_step = 1
     			growth_model_obj.save()
     		except:
     			return Response({
@@ -63,7 +62,8 @@ class UpdateGrowthModelView(APIView):
 
     def patch(self, request, id=None):
     	try:
-    		growthmodel_obj = GrowthModel.objects.get(id=id)
+    		growthmodel_obj = GrowthModel.objects.get(id=id,
+    			user_id=request.user.id)
     	except:
     		return Response({
 				"message": "No growth model found."
@@ -93,3 +93,38 @@ class GetProfessionView(APIView):
 		return Response({
 				"data": data
 			}, status=status.HTTP_200_OK)
+
+class GetGrowthModelActivityView(APIView):
+	authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (IsAuthenticated,)
+
+	def get(self, request):
+		try:
+			growthmodel_obj = GrowthModel.objects.get(user_id=request.user.id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=404)
+
+		growthmodel_activities = GrowthModelActivity.objects.filter(
+			growth_model=growthmodel_obj.id)
+
+		data = []
+		if growthmodel_activities.count() > 0:
+			data = GetGrowthModelActivitySerializer(growthmodel_activities, many=True).data
+
+		return Response({
+				"data": data
+			}, status=status.HTTP_200_OK)
+
+class DeleteGrowthModelActivityView(APIView):
+	authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (IsAuthenticated,)
+
+	def delete(self, request, id=None):
+		item = get_object_or_404(GrowthModelActivity, id=id)
+		item.delete()
+		return Response({
+			"status": "success",
+			"data": "Growth Model Activity Deleted"
+		})

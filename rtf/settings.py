@@ -27,7 +27,7 @@ config.read(os.path.join(BASE_DIR, 'config.ini'))
 SECRET_KEY = 'django-insecure-uclm1-!0=fnqcebl@t%sjko&8x1psj42mnup^axzqm($eb#)4d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config['DEBUG']['DEBUG_FLAG']
 
 ALLOWED_HOSTS = ['*']
 
@@ -80,15 +80,15 @@ WSGI_APPLICATION = 'rtf.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 #remote
-DATABASE_CRADENTIAL = config['DATABASE']
+DATABASE_CREDENTIAL = config['DATABASE']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DATABASE_CRADENTIAL['DB_NAME'],
-        'USER': DATABASE_CRADENTIAL['DB_USER'],
-        'PASSWORD': DATABASE_CRADENTIAL['DB_PASSWORD'],
-        'HOST': DATABASE_CRADENTIAL['DB_HOST'],
-        'PORT': DATABASE_CRADENTIAL['DB_PORT'],
+        'NAME': DATABASE_CREDENTIAL['DB_NAME'],
+        'USER': DATABASE_CREDENTIAL['DB_USER'],
+        'PASSWORD': DATABASE_CREDENTIAL['DB_PASSWORD'],
+        'HOST': DATABASE_CREDENTIAL['DB_HOST'],
+        'PORT': DATABASE_CREDENTIAL['DB_PORT'],
     }
 }
 
