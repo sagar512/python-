@@ -1,33 +1,34 @@
 stages:
-  - build_dev
-  - push_dev
-  - deploy_dev
+  - build_qa
+  - push_qa
+  - deploy_qa
 
-build_dev:
-  stage: build_dev
+build_qa:
+  stage: build_qa
   tags:
     - docker-exec
   script:
-    - docker build -t docker.indianic.com/rtf-yilway/python-growthmodel-api-dev:latest .
+    - docker build -t docker.indianic.com/rtf-yilway/python-growthmodel-api-qa:latest .
 
   only:
-    - dev
+    - qa
 
-push_dev:
-  stage: push_dev
+push_qa:
+  stage: push_qa
   tags:
     - docker-exec
   script:
-    - docker push docker.indianic.com/rtf-yilway/python-growthmodel-api-dev:latest
-  only:
-    - dev
+    - docker push docker.indianic.com/rtf-yilway/python-growthmodel-api-qa:latest
 
-deploy_dev:
-  stage: deploy_dev
+  only:
+    - qa
+
+deploy_qa:
+  stage: deploy_qa
   tags:
     - shell-exec
   script:
     - ssh -o StrictHostKeyChecking=no $USER@$HOST "cd /home/indianic/python_dev && sh deploy.sh"
 
   only:
-    - dev
+    - qa
