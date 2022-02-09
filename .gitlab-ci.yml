@@ -28,7 +28,7 @@ deploy_qa:
   tags:
     - shell-exec
   script:
-    - ssh -o StrictHostKeyChecking=no $USER@$HOST "cd /home/indianic/python_dev && sh deploy.sh"
+    - ssh -o StrictHostKeyChecking=no $USER1@$HOST1 "cd /home/indianic/python_qa && sh deploy.sh"
 
   only:
     - qa
