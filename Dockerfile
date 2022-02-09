@@ -20,6 +20,6 @@ RUN python rtf/manage.py makemigrations
 
 RUN python rtf/manage.py migrate
 
-EXPOSE 8000
+EXPOSE 8002
 
-CMD python manage.py runserver 0.0.0.0:8000
+CMD python manage.py runserver 0.0.0.0:8002
