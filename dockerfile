@@ -10,7 +10,7 @@ WORKDIR /code
 
 COPY requirements.txt /code/
 
-RUN pip install --upgrade pip
+#RUN pip install --upgrade pip
 
 RUN pip install -r requirements.txt
 
@@ -18,7 +18,7 @@ COPY . /code/
 
 COPY ./config.ini.dev /code/config.ini
 
-RUN python manage.py makemigrations logpipe
+RUN python manage.py makemigrations 
 
 RUN python manage.py migrate
 
