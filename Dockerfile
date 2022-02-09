@@ -8,17 +8,17 @@ RUN mkdir /code
 
 WORKDIR /code
 
-COPY ./requirements.txt /code
+COPY ./rtf/requirements.txt /code
 
 RUN pip install -r requirements.txt
 
 COPY . /code/
 
-COPY ./config.ini.dev /code/config.ini
+COPY ./rtf/config.ini.dev /code/config.ini
 
-RUN python manage.py makemigrations
+RUN python rtf/manage.py makemigrations
 
-RUN python manage.py migrate
+RUN python rtf/manage.py migrate
 
 EXPOSE 8000
 
