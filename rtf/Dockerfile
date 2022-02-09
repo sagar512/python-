@@ -8,6 +8,8 @@ RUN mkdir /code
 
 WORKDIR /code
 
+CMD cd /rtf
+
 COPY requirements.txt /code/
 
 RUN pip install -r requirements.txt
