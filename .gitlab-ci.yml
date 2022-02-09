@@ -8,7 +8,7 @@ build_dev:
   tags:
     - docker-exec
   script:
-    - docker build -t docker.indianic.com/yilway-growthmodel-python-api-dev:latest .
+    - docker build -t docker.indianic.com/rtf-yilway/python-growthmodel-api-dev:latest .
 
   only:
     - dev
@@ -18,8 +18,7 @@ push_dev:
   tags:
     - docker-exec
   script:
-    - docker push docker.indianic.com/yilway-growthmodel-python-api-dev:latest
-
+    - docker push docker.indianic.com/rtf-yilway/python-growthmodel-api-dev:latest
   only:
     - dev
 
