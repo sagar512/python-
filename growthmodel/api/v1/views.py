@@ -2,6 +2,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView
 
 from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
@@ -94,20 +95,61 @@ class GetProfessionView(APIView):
 				"data": data
 			}, status=status.HTTP_200_OK)
 
+class AddGrowthModelActivityView(ListCreateAPIView):
+	authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (IsAuthenticated,)
+	serializer_class = AddGrowthModelActivitySerializer
+	queryset = GrowthModelActivity.objects.all()
+
+	def create(self, request, *args, **kwargs):
+		growthmodel_id = request.data.get('growthmodel_id')
+		activities = request.data.get('activities')
+
+		try:
+			growthmodel_obj = GrowthModel.objects.get(id=growthmodel_id,
+				user_id=request.user.id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=404)
+
+		activity_data = []
+		for activity in activities:
+			skillArea = activity['skillArea']
+			for skill in activity['skillTypes']:
+				skillType = skill['typeName']
+				for dt in skill['data']:
+					activity_data.append({
+						'growthmodel_id': growthmodel_id,
+						'skill_area' : skillArea,
+						'activity_type' : skillType,
+						'activity_id' : dt['activityId'],
+						'activity_title' : dt['activityTitle'],
+						'status': 'inProgress'
+					})
+
+		serializer = self.get_serializer(data=activity_data, many=True)
+		serializer.is_valid(raise_exception=True)
+		self.perform_create(serializer)
+		headers = self.get_success_headers(serializer.data)
+		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 class GetGrowthModelActivityView(APIView):
 	authentication_classes = [UserTokenAuthentication,]
 	permission_classes = (IsAuthenticated,)
 
 	def get(self, request):
+		growthmodel_id = request.GET.get('growthmodel_id')
 		try:
-			growthmodel_obj = GrowthModel.objects.get(user_id=request.user.id)
+			growthmodel_obj = GrowthModel.objects.get(user_id=request.user.id,
+				id=growthmodel_id)
 		except:
 			return Response({
 				"message": "No growth model found."
 			}, status=404)
 
 		growthmodel_activities = GrowthModelActivity.objects.filter(
-			growth_model=growthmodel_obj.id)
+			growthmodel_id=growthmodel_id)
 
 		data = []
 		if growthmodel_activities.count() > 0:
@@ -116,6 +158,32 @@ class GetGrowthModelActivityView(APIView):
 		return Response({
 				"data": data
 			}, status=status.HTTP_200_OK)
+
+class UpdateGrowthModelActivityView(APIView):
+    authentication_classes = [UserTokenAuthentication,]
+    permission_classes = (IsAuthenticated,)
+
+    def patch(self, request, id=None):
+    	try:
+    		growthmodelactivity_obj = GrowthModelActivity.objects.get(id=id)
+    	except:
+    		return Response({
+				"message": "No growth model activity found."
+			}, status=404)
+
+    	serializer = UpdateGrowthModelActivitySerializer(growthmodelactivity_obj,
+    		data=request.data, partial=True)
+    	if serializer.is_valid():
+    		serializer.save()
+    		return Response({
+	    			"message": "Growth Model Activity updated successfully.",
+	    			"data": serializer.data
+    			}, status=status.HTTP_204_NO_CONTENT)
+    	else:
+    		return Response({
+	    			"status": "error",
+	    			"data": serializer.errors
+	    		}, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteGrowthModelActivityView(APIView):
 	authentication_classes = [UserTokenAuthentication,]

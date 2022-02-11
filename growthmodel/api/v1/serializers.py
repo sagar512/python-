@@ -4,6 +4,8 @@ from rest_framework.exceptions import ValidationError, APIException
 
 from growthmodel.models import *
 from account.models import *
+from django.utils import timezone
+from datetime import date
 
 class GetGrowthModelSerializer(serializers.ModelSerializer):
 
@@ -51,34 +53,42 @@ class GetGrowthModelActivitySerializer(serializers.ModelSerializer):
         model = GrowthModelActivity
         fields = '__all__'
 
-class AddGrowthModelActivitySerializer(serializers.Serializer):
-    pass
+class BulkCreateGrowthModelActivitiesListSerializer(serializers.ListSerializer):
 
-class UpdateGrowthModelActivitySerializer(serializers.Serializer):
-    start_date = serializers.CharField(error_messages={
-        'required': "profession field is required", 'blank': "profession field can't be blank"})
-    end_date = serializers.CharField(error_messages={
-        'required': "profession is required", 'blank': "profession can't be blank"})
-    compilation_method = serializers.CharField(error_messages={
-        'required': "compilation method is required", 'blank': "compilation method can't be blank"})
-    current_step = serializers.IntegerField(error_messages={
-        'required': "step is required", 'blank': "step can't be blank"})
+    def create(self, validated_data):
+        activities = [GrowthModelActivity(**activity) for activity in validated_data]
+        return GrowthModelActivity.objects.bulk_create(activities)
+
+class AddGrowthModelActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GrowthModelActivity
         fields = '__all__'
+        list_serializer_class = BulkCreateGrowthModelActivitiesListSerializer
+
+class UpdateGrowthModelActivitySerializer(serializers.ModelSerializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
 
     def validate(self, attrs):
-        compilation_method = attrs['compilation_method']
-        current_step = attrs['current_step']
+        if 'start_date' in attrs and 'end_date' in attrs:
+            start_date = attrs['start_date']
+            end_date = attrs['end_date']
 
-        if compilation_method.lower() not in ['manual', 'automatic']:
-            raise ValidationError({"message": "Please provide valid compilation method."})
+            if start_date and start_date < date.today():
+                raise ValidationError({"message": "Start date should be more than now."})
 
-        if current_step not in [0,1,2,3,4]:
-            raise ValidationError({"message": "Please provide valid step."})
+            if end_date and end_date < date.today():
+                raise ValidationError({"message": "End date should be more than now."})
+
+            if start_date and end_date and (end_date < start_date):
+                raise ValidationError({"message": "End date must be after start date."})
 
         return attrs
+
+    class Meta:
+        model = GrowthModelActivity
+        fields = '__all__'
 
 class DeleteGrowthModelActivitySerializer(serializers.Serializer):
 

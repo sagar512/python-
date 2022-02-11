@@ -46,18 +46,18 @@ class GrowthModel(models.Model):
 
 class GrowthModelActivity(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-	growth_model = models.UUIDField(db_column='growthModel')
-	skill_type = models.CharField(db_column='skillType', max_length=255)
+	growthmodel_id = models.UUIDField(db_column='growthModelId')
+	skill_area = models.CharField(db_column='skillArea', max_length=255)
 	activity_type = models.CharField(db_column='activityType', max_length=255)
 	activity_id = models.UUIDField(db_column='activityId', null=True, blank=True)
 	activity_link = models.TextField(db_column='activityLink', null=True, blank=True)
 	activity_title = models.CharField(db_column='activityTitle', max_length=255)
-	start_date = models.DateTimeField(db_column='startDate', blank=True, null=True)
-	end_date = models.DateTimeField(db_column='endDate', blank=True, null=True)
+	start_date = models.DateField(db_column='startDate', blank=True, null=True)
+	end_date = models.DateField(db_column='endDate', blank=True, null=True)
 	alert = models.BooleanField(default=True)
 	status = models.CharField(max_length=30, choices=ACTIVITY_STATUS)
 	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
 	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
 
 	def __str__(self):
-		return self.growth_model
+		return self.growthmodel_id
