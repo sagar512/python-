@@ -75,6 +75,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rtf.wsgi.application'
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
