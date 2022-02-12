@@ -55,9 +55,9 @@ class GrowthModelActivity(models.Model):
 	start_date = models.DateField(db_column='startDate', blank=True, null=True)
 	end_date = models.DateField(db_column='endDate', blank=True, null=True)
 	alert = models.BooleanField(default=True)
-	status = models.CharField(max_length=30, choices=ACTIVITY_STATUS)
+	activity_status = models.CharField(max_length=30, choices=ACTIVITY_STATUS)
 	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
 	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
 
 	def __str__(self):
-		return self.growthmodel_id
+		return "{0} - {1}".format(self.growthmodel_id, self.skill_area)

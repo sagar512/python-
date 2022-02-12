@@ -67,22 +67,23 @@ class AddGrowthModelActivitySerializer(serializers.ModelSerializer):
         list_serializer_class = BulkCreateGrowthModelActivitiesListSerializer
 
 class UpdateGrowthModelActivitySerializer(serializers.ModelSerializer):
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
 
     def validate(self, attrs):
-        if 'start_date' in attrs and 'end_date' in attrs:
-            start_date = attrs['start_date']
-            end_date = attrs['end_date']
+        start_date = None
+        end_date = None
 
+        if 'start_date' in attrs:
+            start_date = attrs['start_date']
             if start_date and start_date < date.today():
                 raise ValidationError({"message": "Start date should be more than now."})
 
+        if 'end_date' in attrs:
+            end_date = attrs['end_date']
             if end_date and end_date < date.today():
                 raise ValidationError({"message": "End date should be more than now."})
 
-            if start_date and end_date and (end_date < start_date):
-                raise ValidationError({"message": "End date must be after start date."})
+        if start_date and end_date and (end_date < start_date):
+            raise ValidationError({"message": "End date must be after start date."})
 
         return attrs
 

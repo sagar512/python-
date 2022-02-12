@@ -8,6 +8,9 @@ from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
 from rest_framework import status
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 
 class CreateGrowthModelView(APIView):
     authentication_classes = [UserTokenAuthentication,]
@@ -68,7 +71,7 @@ class UpdateGrowthModelView(APIView):
     	except:
     		return Response({
 				"message": "No growth model found."
-			}, status=404)
+			}, status=status.HTTP_404_NOT_FOUND)
 
     	serializer = UpdateGrowthModelSerializer(
     		growthmodel_obj, data=request.data, partial=True)
@@ -111,7 +114,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 		except:
 			return Response({
 				"message": "No growth model found."
-			}, status=404)
+			}, status=status.HTTP_404_NOT_FOUND)
 
 		activity_data = []
 		for activity in activities:
@@ -125,7 +128,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 						'activity_type' : skillType,
 						'activity_id' : dt['activityId'],
 						'activity_title' : dt['activityTitle'],
-						'status': 'inProgress'
+						'activity_status': 'inProgress'
 					})
 
 		serializer = self.get_serializer(data=activity_data, many=True)
@@ -146,10 +149,22 @@ class GetGrowthModelActivityView(APIView):
 		except:
 			return Response({
 				"message": "No growth model found."
-			}, status=404)
+			}, status=status.HTTP_404_NOT_FOUND)
+
+		skill_area = request.GET.get('skill_area', '')
+		activity_type = request.GET.get('activity_type', '')
+		activity_status = request.GET.get('activity_status', '')
+
+		q_filter = Q(growthmodel_id=growthmodel_id)
+		if skill_area:
+			q_filter &= Q(skill_area__iexact=skill_area)
+		if activity_type:
+			q_filter &= Q(activity_type__iexact=activity_type)
+		if activity_status:
+			q_filter &= Q(activity_status__iexact=activity_status)
 
 		growthmodel_activities = GrowthModelActivity.objects.filter(
-			growthmodel_id=growthmodel_id)
+			q_filter)
 
 		data = []
 		if growthmodel_activities.count() > 0:
@@ -169,7 +184,7 @@ class UpdateGrowthModelActivityView(APIView):
     	except:
     		return Response({
 				"message": "No growth model activity found."
-			}, status=404)
+			}, status=status.HTTP_404_NOT_FOUND)
 
     	serializer = UpdateGrowthModelActivitySerializer(growthmodelactivity_obj,
     		data=request.data, partial=True)
