@@ -9,7 +9,7 @@ from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Count, F, Sum, Avg
 
 
 class CreateGrowthModelView(APIView):
@@ -211,3 +211,38 @@ class DeleteGrowthModelActivityView(APIView):
 			"status": "success",
 			"data": "Growth Model Activity Deleted"
 		})
+
+class GetGrowthModelActivityStatsView(APIView):
+	authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (IsAuthenticated,)
+
+	def get(self, request):
+		growthmodel_id = request.GET.get('growthmodel_id')
+		try:
+			growthmodel_obj = GrowthModel.objects.get(user_id=request.user.id,
+				id=growthmodel_id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=status.HTTP_404_NOT_FOUND)
+
+		growthModelActObjs = GrowthModelActivity.objects.filter(growthmodel_id=growthmodel_id)
+		skill_total_dict = dict(growthModelActObjs.values('skill_area').annotate(
+			skill_total=Count('skill_area')).values_list('skill_area', 'skill_total'))
+		status_total_dict = growthModelActObjs.values('skill_area', 'activity_status').annotate(
+			total=Count('skill_area'))
+
+		data = {}
+		for skill in status_total_dict:
+			if skill['skill_area'] not in data.keys():
+				data[skill['skill_area']] = {
+					skill['activity_status']: \
+						round(float(skill['total'] / skill_total_dict.get(skill['skill_area']) * 100), 2)
+				}
+			elif skill['activity_status'] not in data[skill['skill_area']].keys():
+				data[skill['skill_area']][skill['activity_status']] = \
+					round(float(skill['total'] / skill_total_dict.get(skill['skill_area']) * 100), 2)
+
+		return Response({
+				"data": data
+			}, status=status.HTTP_200_OK)
