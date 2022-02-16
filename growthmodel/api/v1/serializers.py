@@ -11,7 +11,7 @@ class GetGrowthModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GrowthModel
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
 
 class CreateGrowthModelSerializer(serializers.Serializer):
     job_type = serializers.CharField(error_messages={
@@ -51,7 +51,7 @@ class GetGrowthModelActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GrowthModelActivity
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
 
 class BulkCreateGrowthModelActivitiesListSerializer(serializers.ListSerializer):
 

@@ -56,6 +56,11 @@ class GetGrowthModelView(APIView):
 				}, status=status.HTTP_404_NOT_FOUND)
 
 		data = GetGrowthModelSerializer(growthmodel_obj).data
+		growthModelActivities = GrowthModelActivity.objects.filter(
+			growthmodel_id=growthmodel_obj.id)
+		data['activities'] = list(GetGrowthModelActivitySerializer(
+			growthModelActivities, many=True).data)
+
 		return Response({
 				"data": data
 			}, status=status.HTTP_200_OK)
