@@ -2,8 +2,11 @@ asgiref==3.5.0
 Django==4.0.1
 django-cors-headers==3.11.0
 django-filter==21.1
+django-logpipe==1.1.0
 djangorestframework==3.13.1
 importlib-metadata==4.10.1
+kafka-python==2.0.2
+lru-dict==1.1.7
 Markdown==3.3.6
 psycopg2-binary==2.9.3
 PyJWT==2.3.0

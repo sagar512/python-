@@ -5,5 +5,10 @@ DB_PASSWORD = rtf_yilway
 DB_HOST = 10.2.1.41
 DB_PORT = 5432
 
-[DEBUG]
-DEBUG_FLAG = False
+[APP]
+DEBUG = False
+
+[KAFKA]
+BOOTSTRAP_SERVER = 10.2.112.17:9092
+CONSUMER_GROUP_ID = test-growthmodel-group
+VERSION = 0.5

@@ -27,7 +27,7 @@ config.read(os.path.join(BASE_DIR, 'config.ini'))
 SECRET_KEY = 'django-insecure-uclm1-!0=fnqcebl@t%sjko&8x1psj42mnup^axzqm($eb#)4d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config['DEBUG']['DEBUG_FLAG']
+DEBUG = config['APP']['DEBUG']
 
 ALLOWED_HOSTS = ['*']
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'logpipe',
     'rest_framework',
     'account',
     'growthmodel',
@@ -78,6 +79,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'rtf.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# Kafka Configuration
+LOGPIPE = {
+    # Required Settings
+    'OFFSET_BACKEND': 'logpipe.backend.kafka.ModelOffsetStore',
+    'CONSUMER_BACKEND': 'logpipe.backend.kafka.Consumer',
+    'PRODUCER_BACKEND': 'logpipe.backend.kafka.Producer',
+    'KAFKA_BOOTSTRAP_SERVERS': [
+        # 'kafka:9092'
+        config['KAFKA']['BOOTSTRAP_SERVER'] 
+    ],
+    'KAFKA_CONSUMER_KWARGS': {
+        # 'group_id': 'django-logpipe',
+        'group_id': config['KAFKA']['CONSUMER_GROUP_ID'],
+    },
+
+    # Optional Settings
+    # 'KAFKA_SEND_TIMEOUT': 10,
+    # 'KAFKA_MAX_SEND_RETRIES': 0,
+    # 'MIN_MESSAGE_LAG_MS': 0,
+    # 'DEFAULT_FORMAT': 'json',
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
