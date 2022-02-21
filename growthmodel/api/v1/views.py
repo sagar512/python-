@@ -87,14 +87,15 @@ class UpdateGrowthModelView(APIView):
     		growthmodel_obj, data=request.data, partial=True)
     	if serializer.is_valid():
     		serializer.save()
-    		headers["Access-Control-Allow-Origin"] = '*'
-    		headers["Access-Control-Allow-Methods"] = "DELETE, GET, OPTIONS, PATCH, POST, PUT"
-    		headers["Access-Control-Max-Age"] = '1000'
-    		headers["Access-Control-Allow-Headers"] = "accept, accept-encoding, authorization, content-type, dnt, origin, user-agent, x-csrftoken, x-requested-with"
+    		# headers = {}
+    		# headers["Access-Control-Allow-Origin"] = '*'
+    		# headers["Access-Control-Allow-Methods"] = "DELETE, GET, OPTIONS, PATCH, POST, PUT"
+    		# headers["Access-Control-Max-Age"] = '1000'
+    		# headers["Access-Control-Allow-Headers"] = "accept, accept-encoding, authorization, content-type, dnt, origin, user-agent, x-csrftoken, x-requested-with"
     		return Response({
 	    			"message": "GrowthModel updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_204_NO_CONTENT, headers=headers)
+    			}, status=status.HTTP_204_NO_CONTENT)
     	else:
     		return Response({
 	    			"status": "error",
