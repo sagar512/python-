@@ -32,7 +32,7 @@ if config['APP']['DEBUG'] == "True":
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['http://localhost:5000']
 
 # Application definition
 
