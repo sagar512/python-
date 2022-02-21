@@ -32,7 +32,7 @@ if config['APP']['DEBUG'] == "True":
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['http://localhost:5000']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -80,11 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rtf.wsgi.application'
 
-CORS_ORIGIN_ALLOW_ALL = False
-
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:5000',
-)
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_METHODS = (
     'DELETE',
