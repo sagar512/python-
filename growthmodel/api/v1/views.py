@@ -8,9 +8,14 @@ from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
 from rest_framework import status
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.db.models import Q, Count, F, Sum, Avg
 
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
 
 class CreateGrowthModelView(APIView):
     authentication_classes = [UserTokenAuthentication,]
@@ -56,6 +61,11 @@ class GetGrowthModelView(APIView):
 				}, status=status.HTTP_404_NOT_FOUND)
 
 		data = GetGrowthModelSerializer(growthmodel_obj).data
+		growthModelActivities = GrowthModelActivity.objects.filter(
+			growthmodel_id=growthmodel_obj.id)
+		data['activities'] = list(GetGrowthModelActivitySerializer(
+			growthModelActivities, many=True).data)
+
 		return Response({
 				"data": data
 			}, status=status.HTTP_200_OK)
@@ -135,6 +145,11 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 		serializer.is_valid(raise_exception=True)
 		self.perform_create(serializer)
 		headers = self.get_success_headers(serializer.data)
+
+		# After successful activities creation, updating current_step
+		growthmodel_obj.current_step = 4
+		growthmodel_obj.save()
+
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class GetGrowthModelActivityView(APIView):
@@ -246,3 +261,40 @@ class GetGrowthModelActivityStatsView(APIView):
 		return Response({
 				"data": data
 			}, status=status.HTTP_200_OK)
+
+
+class GetGrowthModelActivityPdfView(APIView):
+	authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (IsAuthenticated,)
+
+	def get(self, request):
+		growthmodel_id = request.GET.get('growthmodel_id')
+		try:
+			growthmodel_obj = GrowthModel.objects.get(
+				user_id=request.user.id, id=growthmodel_id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=status.HTTP_404_NOT_FOUND)
+
+		activity_list = list(GrowthModelActivity.objects.filter(growthmodel_id=growthmodel_id).values(
+			'skill_area', 'activity_type', 'activity_title', 'start_date', 'end_date', 'activity_status'))
+
+		if len(activity_list) > 0:
+			template = get_template("growthmodel/growth_model_activity.html")
+			template_html = template.render({
+				'activity_list': activity_list
+			})
+
+			result = BytesIO()
+			pdf = pisa.pisaDocument(BytesIO(template_html.encode("ISO-8859-1")), result)
+			if not pdf.err:
+				response = HttpResponse(result.getvalue(), content_type='application/pdf')
+				response['Content-Disposition'] = 'attachment; filename="growth_model_activity.pdf"'
+				return response
+			else:
+				return HttpResponse('Something went wrong. Please try again.')
+		else:
+			return Response({
+				"message": "No growth model activities found."
+			}, status=status.HTTP_404_NOT_FOUND)

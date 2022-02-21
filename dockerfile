@@ -16,8 +16,6 @@ COPY . /code/
 
 COPY ./config.ini.dev /code/config.ini
 
-RUN python manage.py makemigrations
-
 RUN python manage.py migrate
 
 EXPOSE 8001

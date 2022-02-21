@@ -13,5 +13,5 @@ urlpatterns = [
     path('update_growth_model_activity/<uuid:id>', UpdateGrowthModelActivityView.as_view(), name='update_growth_model_activity'),
     path('delete_growth_model_activity/<uuid:id>', DeleteGrowthModelActivityView.as_view(), name='delete_growth_model_activity'),
     path('get_growthmodel_activities_stats', GetGrowthModelActivityStatsView.as_view(), name='get_growthmodel_activities'),
-
+    path('get_growthmodel_activities_pdf', GetGrowthModelActivityPdfView.as_view(), name='get_growthmodel_activities_pdf'),
 ]
