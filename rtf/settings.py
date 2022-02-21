@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'rest_framework',
+    'corsheaders',
     'account',
     'growthmodel',
 ]
@@ -80,7 +80,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rtf.wsgi.application'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:5000',
+)
 
 CORS_ALLOW_METHODS = (
     'DELETE',
