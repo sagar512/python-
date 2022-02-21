@@ -5,5 +5,5 @@ DB_PASSWORD = rtf_yilway
 DB_HOST = 10.2.1.41
 DB_PORT = 5432
 
-[DEBUG]
-DEBUG_FLAG = False
+[APP]
+DEBUG = True
