@@ -87,9 +87,14 @@ class UpdateGrowthModelView(APIView):
     		growthmodel_obj, data=request.data, partial=True)
     	if serializer.is_valid():
     		serializer.save()
+    		data = serializer.data
+    		data["Access-Control-Allow-Origin"] = '*'
+			data["Access-Control-Allow-Methods"] = 'GET,POST,PUT,OPTIONS,PATCH'
+			data["Access-Control-Max-Age"] = '1000'
+			data["Access-Control-Allow-Headers"] = 'X-Requested-With, Content-Type'
     		return Response({
 	    			"message": "GrowthModel updated successfully.",
-	    			"data": serializer.data
+	    			"data": data
     			}, status=status.HTTP_204_NO_CONTENT)
     	else:
     		return Response({
