@@ -208,7 +208,7 @@ class UpdateGrowthModelActivityView(APIView):
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_204_NO_CONTENT)
+    			}, status=status.HTTP_201_CREATED)
     	else:
     		return Response({
 	    			"status": "error",
