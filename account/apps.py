@@ -2,6 +2,7 @@ from django.apps import AppConfig
 from kafka import KafkaConsumer
 from logpipe import Consumer, register_consumer
 import threading, configparser, traceback, sys
+import json
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -13,18 +14,21 @@ class AccountConfig(AppConfig):
     def register_kafka_listener(self, topic, serializer_obj):
         # Poll kafka
         def poll():
-            consumer = KafkaConsumer(topic, bootstrap_servers = [config['KAFKA']['BOOTSTRAP_SERVER']])
+            consumer = KafkaConsumer(topic, bootstrap_servers=[config['KAFKA']['BOOTSTRAP_SERVER']],
+                value_deserializer=lambda m: json.loads(m.decode('ascii')))
             consumer.poll()
 
-            for msg in consumer:
-                consumer = Consumer(topic)
-                consumer.register(serializer_obj)
-                consumer.run()
+            for message in consumer:
+                print("###########################", message.topic, message.partition,
+                    message.offset, message.key, message.value)
+        #         consumer = Consumer(topic)
+        #         consumer.register(serializer_obj)
+        #         consumer.run()
 
-        t1 = threading.Thread(target=poll)
-        t1.start()
+        # t1 = threading.Thread(target=poll)
+        # t1.start()
 
-        self.reset_topic_consumer(topic, serializer_obj)
+        # self.reset_topic_consumer(topic, serializer_obj)
 
     def reset_topic_consumer(self, topic, serializer_obj):
         try:
@@ -49,7 +53,7 @@ class AccountConfig(AppConfig):
         if (is_manage_py and is_runserver) or (not is_manage_py):
             from account.queueservice.consumer_serializers import KafkaUserSerializer
 
-            self.register_kafka_listener('userdbo', KafkaUserSerializer)
+            self.register_kafka_listener('growthdbo', KafkaUserSerializer)
 
 
 

@@ -42,7 +42,7 @@ class GrowthModel(models.Model):
 	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
 
 	def __str__(self):
-		return self.user_id
+		return str(self.id)
 
 class GrowthModelActivity(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
