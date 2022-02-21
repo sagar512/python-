@@ -82,8 +82,6 @@ WSGI_APPLICATION = 'rtf.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOW_CREDENTIALS = False
-
 CORS_ALLOW_METHODS = (
     'DELETE',
     'GET',
@@ -103,7 +101,6 @@ CORS_ALLOW_HEADERS = (
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
-    'access-control-allow-origin',
 )
 
 # Database
