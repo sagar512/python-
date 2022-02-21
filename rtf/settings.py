@@ -27,7 +27,10 @@ config.read(os.path.join(BASE_DIR, 'config.ini'))
 SECRET_KEY = 'django-insecure-uclm1-!0=fnqcebl@t%sjko&8x1psj42mnup^axzqm($eb#)4d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config['DEBUG']['DEBUG_FLAG']
+if config['APP']['DEBUG'] == "True":
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
