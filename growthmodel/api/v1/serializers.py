@@ -16,8 +16,10 @@ class GetGrowthModelSerializer(serializers.ModelSerializer):
 class CreateGrowthModelSerializer(serializers.Serializer):
     job_type = serializers.CharField(error_messages={
     	'required': "job type is required", 'blank': "job type can't be blank"})
+    current_step = serializers.IntegerField(required=False, read_only=True)
 
     def validate(self, attrs):
+        attrs['current_step'] = 1
         return attrs
 
 class UpdateGrowthModelSerializer(serializers.ModelSerializer):
