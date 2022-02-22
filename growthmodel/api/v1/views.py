@@ -181,6 +181,7 @@ class GetGrowthModelActivityView(APIView, PaginationHandlerMixin):
 		skill_area = request.GET.get('skill_area', '')
 		activity_type = request.GET.get('activity_type', '')
 		activity_status = request.GET.get('activity_status', '')
+		keyword = request.GET.get('keyword', '')
 
 		q_filter = Q(growthmodel_id=growthmodel_id)
 		if skill_area:
@@ -189,6 +190,13 @@ class GetGrowthModelActivityView(APIView, PaginationHandlerMixin):
 			q_filter &= Q(activity_type__iexact=activity_type)
 		if activity_status:
 			q_filter &= Q(activity_status__iexact=activity_status)
+		if keyword:
+			q_filter &= Q(
+				Q(skill_area__icontains=keyword) |
+				Q(activity_type__icontains=keyword) |
+				Q(activity_status__icontains=keyword) |
+				Q(activity_title__icontains=keyword)
+			)
 
 		growthmodel_activities = GrowthModelActivity.objects.filter(
 			q_filter).order_by('id')
