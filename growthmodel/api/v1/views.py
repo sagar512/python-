@@ -7,7 +7,6 @@ from rest_framework.generics import ListCreateAPIView
 from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
-from growthmodel.api.v1.paginations import BasicPagination, PaginationHandlerMixin
 from rest_framework import status
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q, Count, F, Sum, Avg
@@ -91,7 +90,7 @@ class UpdateGrowthModelView(APIView):
     		return Response({
     			"message": "GrowthModel updated successfully.",
     			"data": serializer.data
-			}, status=status.HTTP_201_CREATED)
+			}, status=status.HTTP_202_ACCEPTED)
     	else:
     		return Response({
     			"status": "error",
@@ -209,7 +208,7 @@ class UpdateGrowthModelActivityView(APIView):
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_201_CREATED)
+    			}, status=status.HTTP_202_ACCEPTED)
     	else:
     		return Response({
 	    			"status": "error",

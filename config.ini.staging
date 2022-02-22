@@ -6,4 +6,4 @@ DB_HOST = 10.2.1.41
 DB_PORT = 5432
 
 [APP]
-DEBUG = True
+DEBUG = False
