@@ -1,5 +1,5 @@
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
@@ -7,6 +7,7 @@ from rest_framework.generics import ListCreateAPIView
 from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
+from growthmodel.api.v1.paginations import BasicPagination, PaginationHandlerMixin
 from rest_framework import status
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q, Count, F, Sum, Avg
@@ -90,7 +91,7 @@ class UpdateGrowthModelView(APIView):
     		return Response({
     			"message": "GrowthModel updated successfully.",
     			"data": serializer.data
-			}, status=status.HTTP_201_CREATED)
+			}, status=status.HTTP_202_ACCEPTED)
     	else:
     		return Response({
     			"status": "error",
@@ -132,14 +133,23 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 			for skill in activity['skillTypes']:
 				skillType = skill['typeName']
 				for dt in skill['data']:
-					activity_data.append({
+					activity_data_dict = {
 						'growthmodel_id': growthmodel_id,
 						'skill_area' : skillArea,
 						'activity_type' : skillType,
-						'activity_id' : dt['activityId'],
 						'activity_title' : dt['activityTitle'],
 						'activity_status': 'inProgress'
-					})
+					}
+					if 'activityId' in dt:
+						activity_data_dict.update({
+							'activity_id' : dt['activityId']
+						})
+					if 'activityLink' in dt:
+						activity_data_dict.update({
+							'activity_link' : dt['activityLink']
+						})
+
+					activity_data.append(activity_data_dict)
 
 		serializer = self.get_serializer(data=activity_data, many=True)
 		serializer.is_valid(raise_exception=True)
@@ -152,9 +162,11 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class GetGrowthModelActivityView(APIView):
+class GetGrowthModelActivityView(APIView, PaginationHandlerMixin):
 	authentication_classes = [UserTokenAuthentication,]
 	permission_classes = (IsAuthenticated,)
+	serializer_class = GetGrowthModelActivitySerializer
+	pagination_class = BasicPagination
 
 	def get(self, request):
 		growthmodel_id = request.GET.get('growthmodel_id')
@@ -179,15 +191,18 @@ class GetGrowthModelActivityView(APIView):
 			q_filter &= Q(activity_status__iexact=activity_status)
 
 		growthmodel_activities = GrowthModelActivity.objects.filter(
-			q_filter)
+			q_filter).order_by('id')
 
-		data = []
-		if growthmodel_activities.count() > 0:
-			data = GetGrowthModelActivitySerializer(growthmodel_activities, many=True).data
+		page = self.paginate_queryset(growthmodel_activities)
+		if page is not None:
+			serializer = self.get_paginated_response(
+				self.serializer_class(page, many=True).data)
+		else:
+			serializer = self.serializer_class(growthmodel_activities, many=True)
 
 		return Response({
-				"data": data
-			}, status=status.HTTP_200_OK)
+			"data": serializer.data
+		}, status=status.HTTP_200_OK)
 
 class UpdateGrowthModelActivityView(APIView):
     authentication_classes = [UserTokenAuthentication,]
@@ -208,7 +223,7 @@ class UpdateGrowthModelActivityView(APIView):
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_201_CREATED)
+    			}, status=status.HTTP_202_ACCEPTED)
     	else:
     		return Response({
 	    			"status": "error",
@@ -264,14 +279,14 @@ class GetGrowthModelActivityStatsView(APIView):
 
 
 class GetGrowthModelActivityPdfView(APIView):
-	authentication_classes = [UserTokenAuthentication,]
-	permission_classes = (IsAuthenticated,)
+	# authentication_classes = [UserTokenAuthentication,]
+	permission_classes = (AllowAny,)
 
 	def get(self, request):
 		growthmodel_id = request.GET.get('growthmodel_id')
 		try:
 			growthmodel_obj = GrowthModel.objects.get(
-				user_id=request.user.id, id=growthmodel_id)
+				id=growthmodel_id)
 		except:
 			return Response({
 				"message": "No growth model found."
