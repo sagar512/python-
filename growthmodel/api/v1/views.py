@@ -138,6 +138,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 						'activity_type' : skillType,
 						'activity_id' : dt['activityId'],
 						'activity_title' : dt['activityTitle'],
+						'activity_link' : dt['activityLink'],
 						'activity_status': 'inProgress'
 					})
 
