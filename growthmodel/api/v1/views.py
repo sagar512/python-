@@ -88,14 +88,14 @@ class UpdateGrowthModelView(APIView):
     	if serializer.is_valid():
     		serializer.save()
     		return Response({
-	    			"message": "GrowthModel updated successfully.",
-	    			"data": serializer.data
-    			}, status=status.HTTP_204_NO_CONTENT)
+    			"message": "GrowthModel updated successfully.",
+    			"data": serializer.data
+			}, status=status.HTTP_201_CREATED)
     	else:
     		return Response({
-	    			"status": "error",
-	    			"data": serializer.errors
-	    		}, status=status.HTTP_400_BAD_REQUEST)
+    			"status": "error",
+    			"data": serializer.errors
+    		}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetProfessionView(APIView):
 	authentication_classes = [UserTokenAuthentication,]
@@ -208,7 +208,7 @@ class UpdateGrowthModelActivityView(APIView):
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_204_NO_CONTENT)
+    			}, status=status.HTTP_201_CREATED)
     	else:
     		return Response({
 	    			"status": "error",
