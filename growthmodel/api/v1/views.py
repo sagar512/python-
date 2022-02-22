@@ -271,7 +271,7 @@ class GetGrowthModelActivityPdfView(APIView):
 		growthmodel_id = request.GET.get('growthmodel_id')
 		try:
 			growthmodel_obj = GrowthModel.objects.get(
-				user_id=request.user.id, id=growthmodel_id)
+				id=growthmodel_id)
 		except:
 			return Response({
 				"message": "No growth model found."
