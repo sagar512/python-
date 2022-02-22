@@ -7,6 +7,7 @@ from rest_framework.generics import ListCreateAPIView
 from account.authentication import UserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
+from growthmodel.api.v1.paginations import BasicPagination, PaginationHandlerMixin
 from rest_framework import status
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q, Count, F, Sum, Avg
@@ -264,7 +265,7 @@ class GetGrowthModelActivityStatsView(APIView):
 
 
 class GetGrowthModelActivityPdfView(APIView):
-	authentication_classes = [UserTokenAuthentication,]
+	# authentication_classes = [UserTokenAuthentication,]
 	permission_classes = (IsAuthenticated,)
 
 	def get(self, request):
