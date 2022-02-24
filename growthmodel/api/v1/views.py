@@ -91,7 +91,7 @@ class UpdateGrowthModelView(APIView):
     		return Response({
     			"message": "GrowthModel updated successfully.",
     			"data": serializer.data
-			}, status=status.HTTP_202_ACCEPTED)
+			}, status=status.HTTP_200_OK)
     	else:
     		return Response({
     			"status": "error",
@@ -231,7 +231,7 @@ class UpdateGrowthModelActivityView(APIView):
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
-    			}, status=status.HTTP_202_ACCEPTED)
+    			}, status=status.HTTP_200_OK)
     	else:
     		return Response({
 	    			"status": "error",
@@ -247,7 +247,7 @@ class DeleteGrowthModelActivityView(APIView):
 		item.delete()
 		return Response({
 			"status": "success",
-			"data": "Growth Model Activity Deleted"
+			"message": "Growth Model Activity Deleted"
 		})
 
 class GetGrowthModelActivityStatsView(APIView):
