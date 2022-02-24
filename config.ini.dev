@@ -12,3 +12,6 @@ DEBUG = False
 BOOTSTRAP_SERVER = 10.2.112.17:9092
 CONSUMER_GROUP_ID = test-growthmodel-group
 VERSION = 0.5
+
+[JWT]
+SECURITY_TOKEN = securityToken

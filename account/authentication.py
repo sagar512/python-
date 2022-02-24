@@ -2,6 +2,7 @@ from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
 from django.contrib.auth import authenticate, get_user_model
 from account.models import Users
+from django.conf import settings
 import jwt
 
 
@@ -14,7 +15,8 @@ class UserTokenAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('No token provided.')
 
         try:
-            decoded = jwt.decode(authorization_token, "securityToken", algorithms=["HS256"])
+            decoded = jwt.decode(authorization_token,
+                settings.JWT_SECURITY_TOKEN, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token expired.')
         except:

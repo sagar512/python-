@@ -32,7 +32,6 @@ if config['APP']['DEBUG'] == "True":
 else:
     DEBUG = False
 
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -45,8 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'logpipe',
     'rest_framework',
+    'logpipe',
     'account',
     'growthmodel',
 ]
@@ -84,6 +83,27 @@ WSGI_APPLICATION = 'rtf.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
 # Kafka Configuration
 LOGPIPE = {
     # Required Settings
@@ -105,6 +125,8 @@ LOGPIPE = {
     # 'MIN_MESSAGE_LAG_MS': 0,
     # 'DEFAULT_FORMAT': 'json',
 }
+
+JWT_SECURITY_TOKEN = config['JWT']['JWT_SECURITY_TOKEN']
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

@@ -13,7 +13,7 @@ config.read('config.ini')
 
 # User DBO Serializer
 class KafkaUserSerializer(ModelSerializer):
-	MESSAGE_TYPE = 'userdbo'
+	MESSAGE_TYPE = 'growthdbo'
 	VERSION = config['KAFKA']['VERSION']
 	KEY_FIELD = 'id'
 
