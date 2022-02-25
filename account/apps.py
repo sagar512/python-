@@ -2,7 +2,7 @@ from django.apps import AppConfig
 from kafka import KafkaConsumer
 import threading, configparser, traceback, sys
 import json
-from account.queueservice.process_data import ProcessGrowthdboData
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -11,7 +11,7 @@ class AccountConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'account'
 
-    def register_kafka_listener(self, topic):
+    def register_kafka_listener(self, topic, parser):
         # Poll kafka
         def poll():
             consumer = KafkaConsumer(topic, bootstrap_servers=[config['KAFKA']['BOOTSTRAP_SERVER'],],
@@ -19,12 +19,15 @@ class AccountConfig(AppConfig):
             consumer.poll()
 
             for message in consumer:
-                ProcessGrowthdboData(message.key, message.value)
+                action = message.key.decode('utf-8')
+                payload = message.value
+                obj = parser(action, payload)
+                obj.process_growth_model_dbo()
 
         t1 = threading.Thread(target=poll)
         t1.start()
 
-        self.reset_topic_consumer(topic, serializer_obj)
+        self.reset_topic_consumer(topic)
 
     def reset_topic_consumer(self, topic):
         try:
@@ -43,7 +46,9 @@ class AccountConfig(AppConfig):
         is_runserver = any(arg.casefold() == "runserver" for arg in sys.argv)
 
         if (is_manage_py and is_runserver) or (not is_manage_py):
-            self.register_kafka_listener('growthdbo')
+            from account.queueservice.process_data import ProcessGrowthdboData
+
+            self.register_kafka_listener('growthdbo', ProcessGrowthdboData)
 
 
 
