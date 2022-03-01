@@ -3,6 +3,7 @@ from rest_framework.authentication import BaseAuthentication
 from django.contrib.auth import authenticate, get_user_model
 from account.models import Users, Role
 from django.conf import settings
+from rest_framework import status
 import jwt
 
 
@@ -49,8 +50,8 @@ class AdminUserTokenAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('Invalid token.')
 
         try:
-            user = Users.objects.get(master_id=decoded.get('id'),
-                role=Role.objects.filter(title__iexact='admin').first())
+            role = Role.objects.filter(title__iexact='admin').first().id
+            user = Users.objects.get(master_id=decoded.get('id'), role=role)
         except:
             raise exceptions.AuthenticationFailed({'message': 'Invalid user.'})
 
