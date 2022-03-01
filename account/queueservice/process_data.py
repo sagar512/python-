@@ -83,32 +83,35 @@ class ProcessGrowthdboData:
 		return True
 
 	def process_growth_model_dbo(self):
-		if self.action.lower() == 'create' and \
-			self.payload.get('model', '').lower() == 'user':
-			self.create_user(self.payload_data)
-		elif self.action.lower() == 'update' and \
-			self.payload.get('model', '').lower() == 'user':
-			self.update_user(self.master_id, self.payload_data)
-		elif self.action.lower() == 'destroy' and \
-			self.payload.get('model', '').lower() == 'user':
-			self.delete_user(self.master_id)
-		elif self.action.lower() == 'create' and \
-			self.payload.get('model', '').lower() == 'role':
-			self.create_role(self.payload_data)
-		elif self.action.lower() == 'update' and \
-			self.payload.get('model', '').lower() == 'role':
-			self.update_role(self.master_id, self.payload_data)
-		elif self.action.lower() == 'destroy' and \
-			self.payload.get('model', '').lower() == 'role':
-			self.delete_role(self.master_id)
-		elif self.action.lower() == 'create' and \
-			self.payload.get('model', '').lower() == 'token':
-			self.create_token(self.payload_data)
-		elif self.action.lower() == 'update' and \
-			self.payload.get('model', '').lower() == 'token':
-			self.update_token(self.master_id, self.payload_data)
-		elif self.action.lower() == 'destroy' and \
-			self.payload.get('model', '').lower() == 'token':
-			self.delete_token(self.master_id)
-		else:
-			return True
+		try:
+			if self.action.lower() == 'create' and \
+				self.payload.get('model', '').lower() == 'user':
+				self.create_user(self.payload_data)
+			elif self.action.lower() == 'update' and \
+				self.payload.get('model', '').lower() == 'user':
+				self.update_user(self.master_id, self.payload_data)
+			elif self.action.lower() == 'destroy' and \
+				self.payload.get('model', '').lower() == 'user':
+				self.delete_user(self.master_id)
+			elif self.action.lower() == 'create' and \
+				self.payload.get('model', '').lower() == 'role':
+				self.create_role(self.payload_data)
+			elif self.action.lower() == 'update' and \
+				self.payload.get('model', '').lower() == 'role':
+				self.update_role(self.master_id, self.payload_data)
+			elif self.action.lower() == 'destroy' and \
+				self.payload.get('model', '').lower() == 'role':
+				self.delete_role(self.master_id)
+			elif self.action.lower() == 'create' and \
+				self.payload.get('model', '').lower() == 'token':
+				self.create_token(self.payload_data)
+			elif self.action.lower() == 'update' and \
+				self.payload.get('model', '').lower() == 'token':
+				self.update_token(self.master_id, self.payload_data)
+			elif self.action.lower() == 'destroy' and \
+				self.payload.get('model', '').lower() == 'token':
+				self.delete_token(self.master_id)
+		except:
+			pass
+
+		return True
