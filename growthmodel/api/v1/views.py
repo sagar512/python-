@@ -324,8 +324,8 @@ class GetGrowthModelActivityPdfView(APIView):
 
 
 class GetUserGrowthModelActivityForAdminView(APIView, PaginationHandlerMixin):
-	authentication_classes = [AdminUserTokenAuthentication,]
-	permission_classes = (IsAuthenticated,)
+	# authentication_classes = [AdminUserTokenAuthentication,]
+	permission_classes = (AllowAny,)
 	serializer_class = GetGrowthModelActivitySerializer
 	pagination_class = BasicPagination
 
@@ -354,8 +354,8 @@ class GetUserGrowthModelActivityForAdminView(APIView, PaginationHandlerMixin):
 
 
 class GetUserGrowthModelActivityStatsForAdminView(APIView):
-	authentication_classes = [AdminUserTokenAuthentication,]
-	permission_classes = (IsAuthenticated,)
+	# authentication_classes = [AdminUserTokenAuthentication,]
+	permission_classes = (AllowAny,)
 
 	def get(self, request):
 		user_id = request.GET.get('user_id')
