@@ -14,4 +14,4 @@ CONSUMER_GROUP_ID = test-growthmodel-group
 VERSION = 0.5
 
 [JWT]
-SECURITY_TOKEN = securityToken
+JWT_SECURITY_TOKEN = securityToken
