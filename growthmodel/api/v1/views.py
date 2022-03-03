@@ -26,13 +26,13 @@ class CreateGrowthModelView(APIView):
     	serializer = CreateGrowthModelSerializer(data=request.data)
     	if serializer.is_valid():
     		data = serializer.validated_data
-    		job_type = data['job_type']
     		try:
     			growth_model_obj, created = GrowthModel.objects.get_or_create(
     				user_id=request.user.id)
-    			growth_model_obj.job_type = job_type
+    			growth_model_obj.job_type = data['job_type']
     			growth_model_obj.current_step = 1
     			growth_model_obj.save()
+    			data.update({ 'id' : growth_model_obj.id })
     		except:
     			return Response({
     					"message": "Oops, something went wrong. Please try again."
@@ -40,7 +40,7 @@ class CreateGrowthModelView(APIView):
 
     		return Response({
 	    			"message": "GrowthModel created successfully.",
-	    			"data": serializer.data
+	    			"data": data
     			}, status=status.HTTP_200_OK)
     	else:
     		return Response({
