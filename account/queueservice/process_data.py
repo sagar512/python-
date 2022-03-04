@@ -11,7 +11,12 @@ class ProcessGrowthdboData:
 		self.payload_data = payload.get('data')
 		self.master_id = None
 		if self.action.lower() in ['update', 'delete']:
-			self.master_id = payload.get('query').get('where').get('id')
+			query_data = payload.get('query').get('where')
+			query_keys = query_data.keys()
+			if 'id' in query_keys:
+				self.master_id = query_data.get('id')
+			else:
+				self.master_id = query_data.get('masterId')
 
 	def get_django_db_column_name(self, column, keep_contiguous=True):
 		string_length = len(column)
@@ -29,13 +34,17 @@ class ProcessGrowthdboData:
 		return "_".join(parts)
 
 	def get_processed_payload_data(self, payload_data):
-		updated_user_dict = {}
+		updated_payload = {}
 		payload_data.pop('id', '')
-		payload_data.pop('accessToken', '')
+
+		if 'accessToken' in payload_data:
+			payload_data['refreshToken'] = payload_data.get('accessToken', '')
+			payload_data.pop('accessToken', '')
+
 		for key, value in payload_data.items():
 			column_name = self.get_django_db_column_name(key)
-			updated_user_dict.update({ column_name: value })
-		return updated_user_dict
+			updated_payload.update({ column_name: value })
+		return updated_payload
 
 	def create_user(self, payload_data):
 		processed_data = self.get_processed_payload_data(payload_data)
@@ -114,7 +123,8 @@ class ProcessGrowthdboData:
 			elif self.action.lower() == 'destroy' and \
 				self.payload.get('model', '').lower() == 'token':
 				self.delete_token(self.master_id)
-		except:
+		except Exception as e:
+			print("exception", e)
 			pass
 
 		return True
