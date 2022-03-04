@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
 
-from account.authentication import UserTokenAuthentication
+from account.authentication import UserTokenAuthentication, AdminUserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
 from growthmodel.api.v1.paginations import BasicPagination, PaginationHandlerMixin
@@ -26,13 +26,13 @@ class CreateGrowthModelView(APIView):
     	serializer = CreateGrowthModelSerializer(data=request.data)
     	if serializer.is_valid():
     		data = serializer.validated_data
-    		job_type = data['job_type']
     		try:
     			growth_model_obj, created = GrowthModel.objects.get_or_create(
     				user_id=request.user.id)
-    			growth_model_obj.job_type = job_type
+    			growth_model_obj.job_type = data['job_type']
     			growth_model_obj.current_step = 1
     			growth_model_obj.save()
+    			data.update({ 'id' : growth_model_obj.id })
     		except:
     			return Response({
     					"message": "Oops, something went wrong. Please try again."
@@ -40,7 +40,7 @@ class CreateGrowthModelView(APIView):
 
     		return Response({
 	    			"message": "GrowthModel created successfully.",
-	    			"data": serializer.data
+	    			"data": data
     			}, status=status.HTTP_200_OK)
     	else:
     		return Response({
@@ -321,3 +321,69 @@ class GetGrowthModelActivityPdfView(APIView):
 			return Response({
 				"message": "No growth model activities found."
 			}, status=status.HTTP_404_NOT_FOUND)
+
+
+class GetUserGrowthModelActivityForAdminView(APIView, PaginationHandlerMixin):
+	# authentication_classes = [AdminUserTokenAuthentication,]
+	permission_classes = (AllowAny,)
+	serializer_class = GetGrowthModelActivitySerializer
+	pagination_class = BasicPagination
+
+	def get(self, request):
+		user_id = request.GET.get('user_id')
+		try:
+			growthmodel_obj = GrowthModel.objects.get(user_id=user_id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=status.HTTP_404_NOT_FOUND)
+
+		growthmodel_activities = GrowthModelActivity.objects.filter(
+			growthmodel_id=growthmodel_obj.id).order_by('id')
+
+		page = self.paginate_queryset(growthmodel_activities)
+		if page is not None:
+			serializer = self.get_paginated_response(
+				self.serializer_class(page, many=True).data)
+		else:
+			serializer = self.serializer_class(growthmodel_activities, many=True)
+
+		return Response({
+			"data": serializer.data
+		}, status=status.HTTP_200_OK)
+
+
+class GetUserGrowthModelActivityStatsForAdminView(APIView):
+	# authentication_classes = [AdminUserTokenAuthentication,]
+	permission_classes = (AllowAny,)
+
+	def get(self, request):
+		user_id = request.GET.get('user_id')
+		try:
+			growthmodel_obj = GrowthModel.objects.get(user_id=user_id)
+		except:
+			return Response({
+				"message": "No growth model found."
+			}, status=status.HTTP_404_NOT_FOUND)
+
+		growthModelActObjs = GrowthModelActivity.objects.filter(
+			growthmodel_id=growthmodel_obj.id)
+		skill_total_dict = dict(growthModelActObjs.values('skill_area').annotate(
+			skill_total=Count('skill_area')).values_list('skill_area', 'skill_total'))
+		status_total_dict = growthModelActObjs.values('skill_area', 'activity_status').annotate(
+			total=Count('skill_area'))
+
+		data = {}
+		for skill in status_total_dict:
+			if skill['skill_area'] not in data.keys():
+				data[skill['skill_area']] = {
+					skill['activity_status']: \
+						round(float(skill['total'] / skill_total_dict.get(skill['skill_area']) * 100), 2)
+				}
+			elif skill['activity_status'] not in data[skill['skill_area']].keys():
+				data[skill['skill_area']][skill['activity_status']] = \
+					round(float(skill['total'] / skill_total_dict.get(skill['skill_area']) * 100), 2)
+
+		return Response({
+			"data": data
+		}, status=status.HTTP_200_OK)

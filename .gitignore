@@ -139,4 +139,4 @@ package-lock.json
 
 #for dockerfile and gitlab.yml
 .gitlab-ci.yml
- dockerfile
+dockerfile

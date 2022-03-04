@@ -43,8 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',
+    'rest_framework',
+    'logpipe',
     'account',
     'growthmodel',
 ]
@@ -102,6 +103,30 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+# Kafka Configuration
+LOGPIPE = {
+    # Required Settings
+    'OFFSET_BACKEND': 'logpipe.backend.kafka.ModelOffsetStore',
+    'CONSUMER_BACKEND': 'logpipe.backend.kafka.Consumer',
+    'PRODUCER_BACKEND': 'logpipe.backend.kafka.Producer',
+    'KAFKA_BOOTSTRAP_SERVERS': [
+        # 'kafka:9092'
+        config['KAFKA']['BOOTSTRAP_SERVER'] 
+    ],
+    'KAFKA_CONSUMER_KWARGS': {
+        # 'group_id': 'django-logpipe',
+        'group_id': config['KAFKA']['CONSUMER_GROUP_ID'],
+    },
+
+    # Optional Settings
+    # 'KAFKA_SEND_TIMEOUT': 10,
+    # 'KAFKA_MAX_SEND_RETRIES': 0,
+    # 'MIN_MESSAGE_LAG_MS': 0,
+    # 'DEFAULT_FORMAT': 'json',
+}
+
+JWT_SECURITY_TOKEN = config['JWT']['JWT_SECURITY_TOKEN']
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

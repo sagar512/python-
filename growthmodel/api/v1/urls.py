@@ -14,4 +14,8 @@ urlpatterns = [
     path('delete_growth_model_activity/<uuid:id>', DeleteGrowthModelActivityView.as_view(), name='delete_growth_model_activity'),
     path('get_growthmodel_activities_stats', GetGrowthModelActivityStatsView.as_view(), name='get_growthmodel_activities'),
     path('get_growthmodel_activities_pdf', GetGrowthModelActivityPdfView.as_view(), name='get_growthmodel_activities_pdf'),
+    path('get_user_growthmodel_activities_for_admin', GetUserGrowthModelActivityForAdminView.as_view(),
+        name='get_user_growthmodel_activities_for_admin'),
+    path('get_user_growthmodel_activity_stats_for_admin', GetUserGrowthModelActivityStatsForAdminView.as_view(),
+        name='get_user_growthmodel_activity_stats_for_admin'),
 ]

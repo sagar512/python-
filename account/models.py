@@ -65,7 +65,7 @@ class Users(models.Model):
     address = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(db_column='dateOfBirth', blank=True, null=True)  # Field name made lowercase.
     alternate_phone = models.JSONField(db_column='alternatePhone', blank=True, null=True)  # Field name made lowercase.
-    is_signup_details_completed = models.BooleanField(db_column='isSignUpDetailsCompleted')  # Field name made lowercase.
+    is_sign_up_details_completed = models.BooleanField(db_column='isSignUpDetailsCompleted')  # Field name made lowercase.
     profile_id = models.CharField(db_column='profileId', max_length=64, blank=True, null=True)  # Field name made lowercase.
     website_url = models.JSONField(db_column='websiteURL', blank=True, null=True)  # Field name made lowercase.
     auth_type = models.CharField(db_column='authType', max_length=15)  # Field name made lowercase.
@@ -73,6 +73,13 @@ class Users(models.Model):
     suspended_at = models.CharField(db_column='suspendedAt', max_length=15, blank=True, null=True)  # Field name made lowercase.
     password_updated_at = models.CharField(db_column='passwordUpdatedAt', max_length=15, blank=True, null=True)  # Field name made lowercase.
     stripe_customer_id = models.CharField(db_column='stripeCustomerId', max_length=64, blank=True, null=True)  # Field name made lowercase.
+    credits = models.DecimalField(max_digits=65535, decimal_places=65535)
+    current_position = models.CharField(db_column='currentPosition', max_length=128, blank=True, null=True)  # Field name made lowercase.
+    contact_info = models.TextField(db_column='contactInfo', blank=True, null=True)  # Field name made lowercase.
+    fiscal_number = models.CharField(db_column='fiscalNumber', max_length=128, blank=True, null=True)  # Field name made lowercase.
+    pec = models.CharField(max_length=128, blank=True, null=True)
+    cuuipa = models.CharField(max_length=128, blank=True, null=True)
+    subscription_end_at = models.BigIntegerField(db_column='subscriptionEndAt', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

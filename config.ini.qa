@@ -7,3 +7,11 @@ DB_PORT = 5432
 
 [APP]
 DEBUG = False
+
+[KAFKA]
+BOOTSTRAP_SERVER = 10.2.112.17:9092
+CONSUMER_GROUP_ID = test-growthmodel-group
+VERSION = 0.5
+
+[JWT]
+JWT_SECURITY_TOKEN = securityToken

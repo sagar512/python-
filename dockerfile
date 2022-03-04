@@ -8,7 +8,7 @@ RUN mkdir /code
 
 WORKDIR /code
 
-COPY ./requirements.txt /code
+COPY requirements.txt /code/
 
 RUN pip install -r requirements.txt
 
@@ -16,8 +16,10 @@ COPY . /code/
 
 COPY ./config.ini.dev /code/config.ini
 
+RUN python manage.py makemigrations logpipe
+
 RUN python manage.py migrate
 
 EXPOSE 8001
 
-CMD python manage.py runserver 0.0.0.0:8001
+CMD python manage.py runserver 0.0.0.0:8001 --noreload
