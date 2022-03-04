@@ -11,7 +11,7 @@ class ProcessGrowthdboData:
 		self.payload_data = payload.get('data')
 		self.master_id = None
 		if self.action.lower() in ['update', 'delete']:
-			self.master_id = payload.get('query').get('where').get('masterId')
+			self.master_id = payload.get('query').get('where').get('id')
 
 	def get_django_db_column_name(self, column, keep_contiguous=True):
 		string_length = len(column)
@@ -39,7 +39,8 @@ class ProcessGrowthdboData:
 
 	def create_user(self, payload_data):
 		processed_data = self.get_processed_payload_data(payload_data)
-		Users.objects.create(**processed_data)
+		if not Users.objects.filter(master_id=processed_data.get('master_id')).exists():
+			Users.objects.create(**processed_data)
 		return True
 
 	def update_user(self, master_id, payload_data):
@@ -54,7 +55,8 @@ class ProcessGrowthdboData:
 
 	def create_role(self, payload_data):
 		processed_data = self.get_processed_payload_data(payload_data)
-		Role.objects.create(**processed_data)
+		if not Role.objects.filter(master_id=processed_data.get('master_id')).exists():
+			Role.objects.create(**processed_data)
 		return True
 
 	def update_role(self, master_id, payload_data):
@@ -69,7 +71,8 @@ class ProcessGrowthdboData:
 
 	def create_token(self, payload_data):
 		processed_data = self.get_processed_payload_data(payload_data)
-		Tokens.objects.create(**processed_data)
+		if not Tokens.objects.filter(master_id=processed_data.get('master_id')).exists():
+			Tokens.objects.create(**processed_data)
 		return True
 
 	def update_token(self, master_id, payload_data):
