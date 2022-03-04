@@ -15,7 +15,7 @@ class AccountConfig(AppConfig):
         # Poll kafka
         def poll():
             consumer = KafkaConsumer(topic, bootstrap_servers=[config['KAFKA']['BOOTSTRAP_SERVER'],],
-                value_deserializer=lambda m: json.loads(m.decode('ascii')))
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')))
             consumer.poll()
 
             for message in consumer:
