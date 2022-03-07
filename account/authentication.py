@@ -23,11 +23,16 @@ class UserTokenAuthentication(BaseAuthentication):
         except:
             raise exceptions.AuthenticationFailed('Invalid token.')
 
-        try:
-            user = Users.objects.get(master_id=decoded.get('id'))
-        except:
+        # try:
+        #     user = Users.objects.filter(master_id=decoded.get('id')).first()
+        # except:
+        #     raise exceptions.AuthenticationFailed('Invalid user.')
+
+        userObjs = Users.objects.filter(master_id=decoded.get('id'))
+        if not userObjs.exists():
             raise exceptions.AuthenticationFailed('Invalid user.')
 
+        user = userObjs.first()
         if user.is_deleted:
             raise exceptions.AuthenticationFailed('User inactive or deleted.')
 
