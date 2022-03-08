@@ -81,7 +81,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rtf.wsgi.application'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:5000',
+    'http://localhost:5001',
+    'https://yliway-front-dev.devpress.net',
+    'https://yliway-front-stag.devpress.net',
+)
 
 CORS_ALLOW_METHODS = (
     'DELETE',
@@ -102,6 +109,7 @@ CORS_ALLOW_HEADERS = (
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'Access-Control-Allow-Origin',
 )
 
 # Kafka Configuration
