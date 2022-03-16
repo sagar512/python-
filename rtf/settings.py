@@ -84,10 +84,13 @@ WSGI_APPLICATION = 'rtf.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
     'http://localhost:5000',
     'http://localhost:5001',
     'https://yliway-front-dev.devpress.net',
     'https://yliway-front-stag.devpress.net',
+    'https://yliway-admin-dev.devpress.net',
+    'https://yliway-admin-stag.devpress.net',
 )
 
 CORS_ALLOW_METHODS = (
