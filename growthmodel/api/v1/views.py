@@ -98,17 +98,6 @@ class UpdateGrowthModelView(APIView):
     			"data": serializer.errors
     		}, status=status.HTTP_400_BAD_REQUEST)
 
-class GetProfessionView(APIView):
-	authentication_classes = [UserTokenAuthentication,]
-	permission_classes = (IsAuthenticated,)
-
-	def get(self, request):
-		data = GetProfessionSerializer(
-			Profession.objects.all()).data
-		return Response({
-				"data": data
-			}, status=status.HTTP_200_OK)
-
 class AddGrowthModelActivityView(ListCreateAPIView):
 	authentication_classes = [UserTokenAuthentication,]
 	permission_classes = (IsAuthenticated,)

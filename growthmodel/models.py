@@ -20,16 +20,6 @@ ACTIVITY_STATUS = (
 	('completed', 'Completed')
 )
 
-class Profession(models.Model):
-	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-	parent_id = models.UUIDField(db_column='parentId', null=True)
-	title = models.CharField(max_length=255)
-	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
-	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
-
-	def __str__(self):
-		return self.title
-
 class GrowthModel(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user_id = models.UUIDField(db_column='userId')
