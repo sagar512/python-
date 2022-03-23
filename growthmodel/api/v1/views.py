@@ -17,6 +17,10 @@ from io import BytesIO
 from django.template.loader import get_template
 from django.template import Context
 from django.http import HttpResponse
+from growthmodel.queueservice.process_producer_data import (
+	produce_growth_model_data,
+	get_processed_data
+)
 
 class CreateGrowthModelView(APIView):
     authentication_classes = [UserTokenAuthentication,]
@@ -32,7 +36,11 @@ class CreateGrowthModelView(APIView):
     			growth_model_obj.job_type = data['job_type']
     			growth_model_obj.current_step = 1
     			growth_model_obj.save()
-    			data.update({ 'id' : growth_model_obj.id })
+    			data.update({'id': growth_model_obj.id})
+
+    			# Producing GrowthModel data to Kafka Server
+    			produce_growth_model_data('userdbo', b'create',
+    				data, 'GrowthModel', growth_model_obj.id)
     		except:
     			return Response({
     					"message": "Oops, something went wrong. Please try again."
@@ -88,6 +96,11 @@ class UpdateGrowthModelView(APIView):
     		growthmodel_obj, data=request.data, partial=True)
     	if serializer.is_valid():
     		serializer.save()
+
+    		# Producing GrowthModel data to Kafka Server
+			produce_growth_model_data('userdbo', b'update',
+				serializer.data, 'GrowthModel', growthmodel_obj.id)
+
     		return Response({
     			"message": "GrowthModel updated successfully.",
     			"data": serializer.data
