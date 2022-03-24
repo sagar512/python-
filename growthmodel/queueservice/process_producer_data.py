@@ -1,6 +1,7 @@
 from kafka import KafkaProducer
 import threading
 import configparser
+import json
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -40,7 +41,7 @@ class ProduceGrowthModelDataThread(threading.Thread):
         if data:
             data = self.process_data(self.data)
 
-        if self.key.lower() in ['update', 'delete']:
+        if self.key in [b'update', b'delete']:
             query = {
                 "where": {
                     "masterId": self.master_id
@@ -67,4 +68,4 @@ def produce_growth_model_data_thread(topic, key, data, model, master_id):
 
 
 def produce_growth_model_data(topic, key, data, model, master_id):
-    produce_growth_model_data_thread(key, model, data, model, master_id)
+    produce_growth_model_data_thread(topic, key, data, model, master_id)
