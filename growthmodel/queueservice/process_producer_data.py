@@ -8,10 +8,10 @@ config.read('config.ini')
 
 
 class ProduceGrowthModelDataThread(threading.Thread):
-    def __init__(self, topic, key, data, model, master_id, **kwargs):
+    def __init__(self, topic, key, payload_data, model, master_id, **kwargs):
         self.topic = topic
         self.key = key
-        self.data = data
+        self.payload_data = payload_data
         self.master_id = master_id
         self.model = model
         self.extra_dict = kwargs
@@ -27,19 +27,19 @@ class ProduceGrowthModelDataThread(threading.Thread):
         c = camelcase()
         return "".join(next(c)(x) if x else '_' for x in value.split("_"))
 
-    def process_data(self, data):
+    def process_data(self, payload_data):
         processed_data = {}
-        data['master_id'] = self.master_id
-        for col, val in data.items():
+        for col, val in payload_data.items():
             column_name = self.underscore_to_camelcase(col)
             processed_data.update({column_name: val})
+        processed_data['masterId'] = self.master_id
         return processed_data
 
     def get_processed_data(self):
         query = ""
-        data = self.data
-        if data:
-            data = self.process_data(self.data)
+        payload_data = self.payload_data
+        if payload_data:
+            payload_data = self.process_data(self.payload_data)
 
         if self.key in [b'update', b'delete']:
             query = {
@@ -49,7 +49,7 @@ class ProduceGrowthModelDataThread(threading.Thread):
             }
 
         return {
-            "data": data,
+            "data": payload_data,
             "model": self.model,
             "query": query
         }
@@ -63,9 +63,9 @@ class ProduceGrowthModelDataThread(threading.Thread):
         producer.flush()
 
 
-def produce_growth_model_data_thread(topic, key, data, model, master_id):
-    ProduceGrowthModelDataThread(topic, key, data, model, master_id).start()
+def produce_growth_model_data_thread(topic, key, payload_data, model, master_id):
+    ProduceGrowthModelDataThread(topic, key, payload_data, model, master_id).start()
 
 
-def produce_growth_model_data(topic, key, data, model, master_id):
-    produce_growth_model_data_thread(topic, key, data, model, master_id)
+def produce_growth_model_data(topic, key, payload_data, model, master_id):
+    produce_growth_model_data_thread(topic, key, payload_data, model, master_id)

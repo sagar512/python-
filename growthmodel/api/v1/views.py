@@ -37,10 +37,11 @@ class CreateGrowthModelView(APIView):
     			growth_model_obj.save()
     			data.update({'id': str(growth_model_obj.id)})
 
-    			# Producing GrowthModel data to Kafka Server
-    			growth_model_data = data
-    			produce_growth_model_data('userdbo', b'create',
-    				growth_model_data, 'GrowthModel', str(growth_model_obj.id))
+    			if created:
+	    			# Producing GrowthModel data to Kafka Server
+	    			growth_model_data = data
+	    			produce_growth_model_data('userdbo', b'create',
+	    				growth_model_data, 'GrowthModel', str(growth_model_obj.id))
     		except:
     			return Response({
     					"message": "Oops, something went wrong. Please try again."
