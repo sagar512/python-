@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'logpipe',
+    'django_celery_results',
     'account',
     'growthmodel',
 ]
@@ -122,11 +123,9 @@ LOGPIPE = {
     'CONSUMER_BACKEND': 'logpipe.backend.kafka.Consumer',
     'PRODUCER_BACKEND': 'logpipe.backend.kafka.Producer',
     'KAFKA_BOOTSTRAP_SERVERS': [
-        # 'kafka:9092'
         config['KAFKA']['BOOTSTRAP_SERVER'] 
     ],
     'KAFKA_CONSUMER_KWARGS': {
-        # 'group_id': 'django-logpipe',
         'group_id': config['KAFKA']['CONSUMER_GROUP_ID'],
     },
 
@@ -201,3 +200,7 @@ REST_FRAMEWORK = {
         # 'account.authentication.UserTokenAuthentication',
     ]
 }
+
+# Celery config
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
