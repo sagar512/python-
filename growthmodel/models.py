@@ -20,6 +20,13 @@ ACTIVITY_STATUS = (
 	('completed', 'Completed')
 )
 
+ACTIVITY_CATEGORY = (
+	('course', 'Course'),
+	('post', 'Post'),
+	('blog', 'Blog'),
+	('room', 'Room')
+)
+
 class GrowthModel(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user_id = models.UUIDField(db_column='userId')
@@ -38,6 +45,8 @@ class GrowthModelActivity(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	growth_model_id = models.UUIDField(db_column='growthModelId')
 	skill_area = models.CharField(db_column='skillArea', max_length=255)
+	activity_category = models.CharField(db_column='activityCategory',
+		default='course', max_length=255, choices=ACTIVITY_CATEGORY)
 	activity_type = models.CharField(db_column='activityType', max_length=255)
 	activity_id = models.UUIDField(db_column='activityId', null=True, blank=True)
 	activity_link = models.TextField(db_column='activityLink', null=True, blank=True)
