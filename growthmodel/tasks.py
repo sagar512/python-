@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rtf.celery import app
+from django.conf import settings
 
 @shared_task
 def send_growthmodel_activity_alert_email():
@@ -29,9 +30,10 @@ def send_growthmodel_activity_alert_email():
             'growthmodel/growth_model_activity_alert.html', {
                 'activity_type': activity_type,
                 'activity_title': activity_title,
+                'user_name': userObj.first_name
             }
         )
-        from_email = ""
+        from_email = f'YLIWAY Team <{settings.DEFAULT_FROM_EMAIL}>'
         recipient_list = [userObj.email,]
         send_an_email(subject, message_body, recipient_list, from_email)
 

@@ -15,3 +15,12 @@ VERSION = 0.5
 
 [JWT]
 JWT_SECURITY_TOKEN = securityToken
+
+[EMAIL]
+EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST = smtp.gmail.com
+EMAIL_HOST_USER = indianic.yliway@gmail.com
+EMAIL_HOST_PASSWORD = Andrea.2021
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = indianic.yliway@gmail.com
