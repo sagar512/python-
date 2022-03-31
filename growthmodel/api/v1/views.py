@@ -17,6 +17,9 @@ from io import BytesIO
 from django.template.loader import get_template
 from django.template import Context
 from django.http import HttpResponse
+from growthmodel.queueservice.process_producer_data import (
+	produce_growth_model_data
+)
 
 class CreateGrowthModelView(APIView):
     authentication_classes = [UserTokenAuthentication,]
@@ -32,7 +35,13 @@ class CreateGrowthModelView(APIView):
     			growth_model_obj.job_type = data['job_type']
     			growth_model_obj.current_step = 1
     			growth_model_obj.save()
-    			data.update({ 'id' : growth_model_obj.id })
+    			data.update({'id': str(growth_model_obj.id)})
+
+    			if created:
+	    			# Producing GrowthModel data to Kafka Server
+	    			growth_model_data = data
+	    			produce_growth_model_data('userdbo', b'create',
+	    				growth_model_data, 'GrowthModel', str(growth_model_obj.id))
     		except:
     			return Response({
     					"message": "Oops, something went wrong. Please try again."
@@ -63,7 +72,7 @@ class GetGrowthModelView(APIView):
 
 		data = GetGrowthModelSerializer(growthmodel_obj).data
 		growthModelActivities = GrowthModelActivity.objects.filter(
-			growthmodel_id=growthmodel_obj.id)
+			growth_model_id=growthmodel_obj.id)
 		data['activities'] = list(GetGrowthModelActivitySerializer(
 			growthModelActivities, many=True).data)
 
@@ -88,6 +97,12 @@ class UpdateGrowthModelView(APIView):
     		growthmodel_obj, data=request.data, partial=True)
     	if serializer.is_valid():
     		serializer.save()
+
+    		# Producing GrowthModel data to Kafka Server
+    		growth_model_data = serializer.data
+    		produce_growth_model_data('userdbo', b'update',
+    			growth_model_data, 'GrowthModel', str(growthmodel_obj.id))
+
     		return Response({
     			"message": "GrowthModel updated successfully.",
     			"data": serializer.data
@@ -97,17 +112,6 @@ class UpdateGrowthModelView(APIView):
     			"status": "error",
     			"data": serializer.errors
     		}, status=status.HTTP_400_BAD_REQUEST)
-
-class GetProfessionView(APIView):
-	authentication_classes = [UserTokenAuthentication,]
-	permission_classes = (IsAuthenticated,)
-
-	def get(self, request):
-		data = GetProfessionSerializer(
-			Profession.objects.all()).data
-		return Response({
-				"data": data
-			}, status=status.HTTP_200_OK)
 
 class AddGrowthModelActivityView(ListCreateAPIView):
 	authentication_classes = [UserTokenAuthentication,]
@@ -134,7 +138,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 				skillType = skill['typeName']
 				for dt in skill['data']:
 					activity_data_dict = {
-						'growthmodel_id': growthmodel_id,
+						'growth_model_id': growthmodel_id,
 						'skill_area' : skillArea,
 						'activity_type' : skillType,
 						'activity_title' : dt['activityTitle'],
@@ -148,6 +152,10 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 						activity_data_dict.update({
 							'activity_link' : dt['activityLink']
 						})
+					if 'activityCategory' in dt:
+						activity_data_dict.update({
+							'activity_category' : dt['activityCategory']
+						})
 
 					activity_data.append(activity_data_dict)
 
@@ -156,9 +164,21 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 		self.perform_create(serializer)
 		headers = self.get_success_headers(serializer.data)
 
+		growth_model_activity_data = serializer.data
+		for growth_model_activity in growth_model_activity_data:
+			# Producing GrowthModelActivity data to Kafka Server
+			produce_growth_model_data('userdbo', b'create',
+				growth_model_activity, 'GrowthModelActivity',
+				str(growth_model_activity.get('id'))
+			)
+
 		# After successful activities creation, updating current_step
 		growthmodel_obj.current_step = 4
 		growthmodel_obj.save()
+
+		# Producing GrowthModel data to Kafka Server
+		produce_growth_model_data('userdbo', b'update',
+			{'current_step': 4}, 'GrowthModel', str(growthmodel_obj.id))
 
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -183,7 +203,7 @@ class GetGrowthModelActivityView(APIView, PaginationHandlerMixin):
 		activity_status = request.GET.get('activity_status', '')
 		keyword = request.GET.get('keyword', '')
 
-		q_filter = Q(growthmodel_id=growthmodel_id)
+		q_filter = Q(growth_model_id=growthmodel_id)
 		if skill_area:
 			q_filter &= Q(skill_area__iexact=skill_area)
 		if activity_type:
@@ -228,6 +248,12 @@ class UpdateGrowthModelActivityView(APIView):
     		data=request.data, partial=True)
     	if serializer.is_valid():
     		serializer.save()
+
+    		# Producing GrowthModel data to Kafka Server
+    		growth_model_activity_data = serializer.data
+    		produce_growth_model_data('userdbo', b'update', growth_model_activity_data,
+    			'GrowthModelActivity', str(growthmodelactivity_obj.id))
+
     		return Response({
 	    			"message": "Growth Model Activity updated successfully.",
 	    			"data": serializer.data
@@ -245,6 +271,11 @@ class DeleteGrowthModelActivityView(APIView):
 	def delete(self, request, id=None):
 		item = get_object_or_404(GrowthModelActivity, id=id)
 		item.delete()
+
+		# Producing GrowthModel data to Kafka Server
+		produce_growth_model_data('userdbo', b'delete', '',
+			'GrowthModelActivity', str(id))
+
 		return Response({
 			"status": "success",
 			"message": "Growth Model Activity Deleted"
@@ -264,7 +295,7 @@ class GetGrowthModelActivityStatsView(APIView):
 				"message": "No growth model found."
 			}, status=status.HTTP_404_NOT_FOUND)
 
-		growthModelActObjs = GrowthModelActivity.objects.filter(growthmodel_id=growthmodel_id)
+		growthModelActObjs = GrowthModelActivity.objects.filter(growth_model_id=growthmodel_id)
 		skill_total_dict = dict(growthModelActObjs.values('skill_area').annotate(
 			skill_total=Count('skill_area')).values_list('skill_area', 'skill_total'))
 		status_total_dict = growthModelActObjs.values('skill_area', 'activity_status').annotate(
@@ -300,7 +331,7 @@ class GetGrowthModelActivityPdfView(APIView):
 				"message": "No growth model found."
 			}, status=status.HTTP_404_NOT_FOUND)
 
-		activity_list = list(GrowthModelActivity.objects.filter(growthmodel_id=growthmodel_id).values(
+		activity_list = list(GrowthModelActivity.objects.filter(growth_model_id=growthmodel_id).values(
 			'skill_area', 'activity_type', 'activity_title', 'start_date', 'end_date', 'activity_status'))
 
 		if len(activity_list) > 0:
@@ -339,7 +370,7 @@ class GetUserGrowthModelActivityForAdminView(APIView, PaginationHandlerMixin):
 			}, status=status.HTTP_404_NOT_FOUND)
 
 		growthmodel_activities = GrowthModelActivity.objects.filter(
-			growthmodel_id=growthmodel_obj.id).order_by('id')
+			growth_model_id=growthmodel_obj.id).order_by('id')
 
 		page = self.paginate_queryset(growthmodel_activities)
 		if page is not None:
@@ -367,7 +398,7 @@ class GetUserGrowthModelActivityStatsForAdminView(APIView):
 			}, status=status.HTTP_404_NOT_FOUND)
 
 		growthModelActObjs = GrowthModelActivity.objects.filter(
-			growthmodel_id=growthmodel_obj.id)
+			growth_model_id=growthmodel_obj.id)
 		skill_total_dict = dict(growthModelActObjs.values('skill_area').annotate(
 			skill_total=Count('skill_area')).values_list('skill_area', 'skill_total'))
 		status_total_dict = growthModelActObjs.values('skill_area', 'activity_status').annotate(

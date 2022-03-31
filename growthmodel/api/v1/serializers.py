@@ -43,12 +43,6 @@ class UpdateGrowthModelSerializer(serializers.ModelSerializer):
 
         return attrs
 
-class GetProfessionSerializer(serializers.ModelSerializer):
-
-	class Meta:
-		model = Profession
-		fields = '__all__'
-
 class GetGrowthModelActivitySerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -20,15 +20,12 @@ ACTIVITY_STATUS = (
 	('completed', 'Completed')
 )
 
-class Profession(models.Model):
-	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-	parent_id = models.UUIDField(db_column='parentId', null=True)
-	title = models.CharField(max_length=255)
-	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
-	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
-
-	def __str__(self):
-		return self.title
+ACTIVITY_CATEGORY = (
+	('course', 'Course'),
+	('post', 'Post'),
+	('blog', 'Blog'),
+	('room', 'Room')
+)
 
 class GrowthModel(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -46,8 +43,10 @@ class GrowthModel(models.Model):
 
 class GrowthModelActivity(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-	growthmodel_id = models.UUIDField(db_column='growthModelId')
+	growth_model_id = models.UUIDField(db_column='growthModelId')
 	skill_area = models.CharField(db_column='skillArea', max_length=255)
+	activity_category = models.CharField(db_column='activityCategory',
+		default='course', max_length=255, choices=ACTIVITY_CATEGORY)
 	activity_type = models.CharField(db_column='activityType', max_length=255)
 	activity_id = models.UUIDField(db_column='activityId', null=True, blank=True)
 	activity_link = models.TextField(db_column='activityLink', null=True, blank=True)
@@ -55,9 +54,9 @@ class GrowthModelActivity(models.Model):
 	start_date = models.DateField(db_column='startDate', blank=True, null=True)
 	end_date = models.DateField(db_column='endDate', blank=True, null=True)
 	alert = models.BooleanField(default=True)
-	activity_status = models.CharField(max_length=30, choices=ACTIVITY_STATUS)
+	activity_status = models.CharField(db_column='activityStatus', max_length=30, choices=ACTIVITY_STATUS)
 	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
 	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
 
 	def __str__(self):
-		return "{0} - {1}".format(self.growthmodel_id, self.skill_area)
+		return "{0} - {1}".format(self.growth_model_id, self.skill_area)
