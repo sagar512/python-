@@ -152,6 +152,10 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 						activity_data_dict.update({
 							'activity_link' : dt['activityLink']
 						})
+					if 'activityCategory' in dt:
+						activity_data_dict.update({
+							'activity_category' : dt['activityCategory']
+						})
 
 					activity_data.append(activity_data_dict)
 
