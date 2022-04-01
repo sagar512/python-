@@ -122,7 +122,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 
 	def create(self, request, *args, **kwargs):
 		activities = request.data.get('activities')
-		growthmodel_obj, created = GrowthModel.objects.get(
+		growthmodel_obj, created = GrowthModel.objects.get_or_create(
 			user_id=request.user.id)
 
 		current_step = 4
