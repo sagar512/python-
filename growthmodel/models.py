@@ -30,10 +30,13 @@ ACTIVITY_CATEGORY = (
 class GrowthModel(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user_id = models.UUIDField(db_column='userId')
-	job_type = models.CharField(db_column='jobType', max_length=30, choices=JOB_TYPE)
-	profession_field = models.CharField(db_column='professionField', max_length=255)
-	profession = models.CharField(max_length=255)
-	compilation_method = models.CharField(db_column='compilationMethod', max_length=255, choices=COMPILATION_METHOD)
+	job_type = models.CharField(db_column='jobType', max_length=30, choices=JOB_TYPE,
+		null=True, blank=True)
+	profession_field = models.CharField(db_column='professionField', max_length=255,
+		null=True, blank=True)
+	profession = models.CharField(max_length=255, null=True, blank=True)
+	compilation_method = models.CharField(db_column='compilationMethod', max_length=255,
+		choices=COMPILATION_METHOD, null=True, blank=True)
 	current_step = models.IntegerField(db_column='currentStep', default=0)
 	created_at = models.DateTimeField(db_column='createdAt', auto_now_add=True)
 	updated_at = models.DateTimeField(db_column='updatedAt', auto_now=True)
