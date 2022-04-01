@@ -9,6 +9,8 @@ import jwt
 
 class UserTokenAuthentication(BaseAuthentication):
 
+    keyword = 'Bearer'
+
     def authenticate(self, request):
         # get jwt token from authorization
         authorization_token = request.headers.get("authorization", "")
@@ -23,11 +25,6 @@ class UserTokenAuthentication(BaseAuthentication):
         except:
             raise exceptions.AuthenticationFailed('Invalid token.')
 
-        # try:
-        #     user = Users.objects.filter(master_id=decoded.get('id')).first()
-        # except:
-        #     raise exceptions.AuthenticationFailed('Invalid user.')
-
         userObjs = Users.objects.filter(master_id=decoded.get('id'))
         if not userObjs.exists():
             raise exceptions.AuthenticationFailed('Invalid user.')
@@ -37,6 +34,9 @@ class UserTokenAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('User inactive or deleted.')
 
         return (user, None)
+
+    def authenticate_header(self, request):
+        return self.keyword
 
 class AdminUserTokenAuthentication(BaseAuthentication):
 
