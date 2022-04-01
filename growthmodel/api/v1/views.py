@@ -41,6 +41,7 @@ class CreateGrowthModelView(APIView):
     			if created:
 	    			# Producing GrowthModel data to Kafka Server
 	    			growth_model_data = data
+	    			growth_model_data.update({'user_id': str(growth_model_obj.user_id)})
 	    			produce_growth_model_data('userdbo', b'create',
 	    				growth_model_data, 'GrowthModel', str(growth_model_obj.id))
     		except:
