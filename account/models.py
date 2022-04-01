@@ -80,6 +80,11 @@ class Users(models.Model):
     pec = models.CharField(max_length=128, blank=True, null=True)
     cuuipa = models.CharField(max_length=128, blank=True, null=True)
     subscription_end_at = models.BigIntegerField(db_column='subscriptionEndAt', blank=True, null=True)  # Field name made lowercase.
+    total_post_count = models.IntegerField(db_column='totalPostCount', blank=True, null=True)
+    messaging = models.JSONField(blank=True, null=True)
+    notification_settings = models.JSONField(db_column='notificationSettings', blank=True, null=True)
+    total_likes = models.IntegerField(db_column='totalLikes', blank=True, null=True)
+    total_connections = models.IntegerField(db_column='totalConnections', blank=True, null=True)
 
     class Meta:
         managed = False
