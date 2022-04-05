@@ -130,6 +130,16 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 		if created:
 			current_step = 0
 
+		if created:
+			# Producing GrowthModel data to Kafka Server
+			growth_model_data = {
+				'id': str(growthmodel_obj.id),
+				'user_id': str(growthmodel_obj.user_id),
+				'current_step': current_step
+			}
+			produce_growth_model_data('userdbo', b'create',
+				growth_model_data, 'GrowthModel', str(growthmodel_obj.id))
+
 		activity_data = []
 		for activity in activities:
 			skillArea = activity['skillArea']
