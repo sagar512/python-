@@ -126,11 +126,9 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 		growthmodel_obj, created = GrowthModel.objects.get_or_create(
 			user_id=request.user.id)
 
-		current_step = 4
+		current_step = growthmodel_obj.current_step
 		if created:
 			current_step = 0
-
-		if created:
 			# Producing GrowthModel data to Kafka Server
 			growth_model_data = {
 				'id': str(growthmodel_obj.id),
@@ -139,6 +137,9 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 			}
 			produce_growth_model_data('userdbo', b'create',
 				growth_model_data, 'GrowthModel', str(growthmodel_obj.id))
+		elif growthmodel_obj.job_type and growthmodel_obj.profession_field \
+			and growthmodel_obj.profession and growthmodel_obj.compilation_method:
+			current_step = 4
 
 		activity_data = []
 		for activity in activities:
