@@ -41,7 +41,7 @@ class ProduceGrowthModelDataThread(threading.Thread):
         if payload_data:
             payload_data = self.process_data(self.payload_data)
 
-        if self.key in [b'update', b'delete']:
+        if self.key in [b'update', b'destroy']:
             query = {
                 "where": {
                     "masterId": self.master_id

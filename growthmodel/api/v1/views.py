@@ -283,7 +283,7 @@ class DeleteGrowthModelActivityView(APIView):
 		item.delete()
 
 		# Producing GrowthModel data to Kafka Server
-		produce_growth_model_data('userdbo', b'delete', '',
+		produce_growth_model_data('userdbo', b'destroy', '',
 			'GrowthModelActivity', str(id))
 
 		return Response({
