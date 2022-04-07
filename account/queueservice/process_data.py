@@ -10,7 +10,7 @@ class ProcessGrowthdboData:
 		self.payload = payload
 		self.payload_data = payload.get('data')
 		self.master_id = None
-		if self.action.lower() in ['update', 'delete']:
+		if self.action.lower() in ['update', 'destroy']:
 			query_data = payload.get('query').get('where')
 			query_keys = query_data.keys()
 			if 'id' in query_keys:

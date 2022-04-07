@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
 
+from account.models import Users
 from account.authentication import UserTokenAuthentication, AdminUserTokenAuthentication
 from growthmodel.models import *
 from growthmodel.api.v1.serializers import *
@@ -40,6 +41,7 @@ class CreateGrowthModelView(APIView):
     			if created:
 	    			# Producing GrowthModel data to Kafka Server
 	    			growth_model_data = data
+	    			growth_model_data.update({'user_id': str(growth_model_obj.user_id)})
 	    			produce_growth_model_data('userdbo', b'create',
 	    				growth_model_data, 'GrowthModel', str(growth_model_obj.id))
     		except:
@@ -120,16 +122,24 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 	queryset = GrowthModelActivity.objects.all()
 
 	def create(self, request, *args, **kwargs):
-		growthmodel_id = request.data.get('growthmodel_id')
 		activities = request.data.get('activities')
+		growthmodel_obj, created = GrowthModel.objects.get_or_create(
+			user_id=request.user.id)
 
-		try:
-			growthmodel_obj = GrowthModel.objects.get(id=growthmodel_id,
-				user_id=request.user.id)
-		except:
-			return Response({
-				"message": "No growth model found."
-			}, status=status.HTTP_404_NOT_FOUND)
+		current_step = growthmodel_obj.current_step
+		if created:
+			current_step = 0
+			# Producing GrowthModel data to Kafka Server
+			growth_model_data = {
+				'id': str(growthmodel_obj.id),
+				'user_id': str(growthmodel_obj.user_id),
+				'current_step': current_step
+			}
+			produce_growth_model_data('userdbo', b'create',
+				growth_model_data, 'GrowthModel', str(growthmodel_obj.id))
+		elif growthmodel_obj.job_type and growthmodel_obj.profession_field \
+			and growthmodel_obj.profession and growthmodel_obj.compilation_method:
+			current_step = 4
 
 		activity_data = []
 		for activity in activities:
@@ -138,7 +148,7 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 				skillType = skill['typeName']
 				for dt in skill['data']:
 					activity_data_dict = {
-						'growth_model_id': growthmodel_id,
+						'growth_model_id': growthmodel_obj.id,
 						'skill_area' : skillArea,
 						'activity_type' : skillType,
 						'activity_title' : dt['activityTitle'],
@@ -173,12 +183,12 @@ class AddGrowthModelActivityView(ListCreateAPIView):
 			)
 
 		# After successful activities creation, updating current_step
-		growthmodel_obj.current_step = 4
+		growthmodel_obj.current_step = current_step
 		growthmodel_obj.save()
 
 		# Producing GrowthModel data to Kafka Server
 		produce_growth_model_data('userdbo', b'update',
-			{'current_step': 4}, 'GrowthModel', str(growthmodel_obj.id))
+			{'current_step': current_step}, 'GrowthModel', str(growthmodel_obj.id))
 
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -273,7 +283,7 @@ class DeleteGrowthModelActivityView(APIView):
 		item.delete()
 
 		# Producing GrowthModel data to Kafka Server
-		produce_growth_model_data('userdbo', b'delete', '',
+		produce_growth_model_data('userdbo', b'destroy', '',
 			'GrowthModelActivity', str(id))
 
 		return Response({
