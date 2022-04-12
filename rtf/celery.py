@@ -12,7 +12,11 @@ app.conf.beat_schedule = {
     'send-growthmodel-activity-alert-email': {
         'task': 'growthmodel.tasks.send_growthmodel_activity_alert_email',
         'schedule': crontab(hour=0, minute=15),
-        'schedule': crontab(minute='*/1')
+    },
+    'test': {
+        'task': 'growthmodel.tasks.add',
+        'schedule': crontab(minute='*/1'),
+        'args': (16, 16)
     },
 }
 
