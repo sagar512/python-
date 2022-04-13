@@ -26,11 +26,11 @@ EXPOSE 8001
 
 CMD python manage.py runserver 0.0.0.0:8001 --noreload
 
-FROM celery 
-app = Celery('vwadaptor',
+FROM celery import Celery
+ app = Celery('vwadaptor',
              broker='redis://workerdb:6379/0',
              backend='redis://workerdb:6379/0')
 
-app.control.inspect().active()
+ app.control.inspect().active()
 
 CMD celery -A rtf worker -B -l info
