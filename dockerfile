@@ -26,7 +26,7 @@ EXPOSE 8001
 
 CMD python manage.py runserver 0.0.0.0:8001 --noreload
 
-FROM celery import Celery
+FROM celery 
  app = Celery('vwadaptor',
              broker='redis://workerdb:6379/0',
              backend='redis://workerdb:6379/0')
