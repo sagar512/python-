@@ -22,6 +22,6 @@ RUN python manage.py migrate
 
 EXPOSE 8001
 
-CMD celery -A rtf worker -B
+#CMD celery -A rtf worker -B
 
 CMD python manage.py runserver 0.0.0.0:8001 --noreload
