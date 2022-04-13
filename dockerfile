@@ -19,7 +19,7 @@ COPY ./config.ini.dev /code/config.ini
 RUN python manage.py makemigrations logpipe
 
 RUN python manage.py migrate
-RUN ./rtf/celery.py
+RUN celery.py
 EXPOSE 8001
 
 
