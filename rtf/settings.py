@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'logpipe',
+    'django_celery_results',
     'account',
     'growthmodel',
 ]
@@ -122,11 +123,9 @@ LOGPIPE = {
     'CONSUMER_BACKEND': 'logpipe.backend.kafka.Consumer',
     'PRODUCER_BACKEND': 'logpipe.backend.kafka.Producer',
     'KAFKA_BOOTSTRAP_SERVERS': [
-        # 'kafka:9092'
         config['KAFKA']['BOOTSTRAP_SERVER'] 
     ],
     'KAFKA_CONSUMER_KWARGS': {
-        # 'group_id': 'django-logpipe',
         'group_id': config['KAFKA']['CONSUMER_GROUP_ID'],
     },
 
@@ -201,3 +200,21 @@ REST_FRAMEWORK = {
         # 'account.authentication.UserTokenAuthentication',
     ]
 }
+
+# Celery config
+CELERY_CONFIG = config['CELERY']
+CELERY_BROKER_URL = CELERY_CONFIG['CELERY_BROKER_URL']
+CELERY_RESULT_BACKEND = CELERY_CONFIG['CELERY_RESULT_BACKEND']
+CELERY_RESULT_SERIALIZER = CELERY_CONFIG['CELERY_RESULT_SERIALIZER']
+CELERY_TASK_SERIALIZER = CELERY_CONFIG['CELERY_TASK_SERIALIZER']
+CELERY_ACCEPT_CONTENT = ['application/json',]
+
+# Email Config
+EMAIL_CONFIG = config['EMAIL']
+EMAIL_BACKEND = EMAIL_CONFIG['EMAIL_BACKEND']
+EMAIL_HOST = EMAIL_CONFIG['EMAIL_HOST']
+EMAIL_USE_TLS = EMAIL_CONFIG['EMAIL_USE_TLS']
+EMAIL_PORT = EMAIL_CONFIG['EMAIL_PORT']
+EMAIL_HOST_USER = EMAIL_CONFIG['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = EMAIL_CONFIG['EMAIL_HOST_PASSWORD']
+DEFAULT_FROM_EMAIL = EMAIL_CONFIG['DEFAULT_FROM_EMAIL']
