@@ -12,9 +12,9 @@ COPY requirements.txt /code/
 
 RUN pip install -r requirements.txt
 
-RUN python manage.py makemigrations logpipe
+#RUN python manage.py makemigrations logpipe
 
-RUN python manage.py migrate
+#RUN python manage.py migrate
 
 COPY . /code/
 
