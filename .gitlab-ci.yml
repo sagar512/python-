@@ -19,7 +19,7 @@ push_qa:
     - docker-exec
   script:
     - docker push docker.indianic.com/rtf-yilway/python-growthmodel-api-qa:latest
-
+#
   only:
     - qa
 
